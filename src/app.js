@@ -4,6 +4,9 @@ import { Router, Route, Switch } from "react-router-dom";
 
 import "assets/scss/material-kit-react.scss?v=1.10.0";
 
+import { SnackbarProvider } from "notistack";
+import Slide from "@material-ui/core/Slide";
+
 // pages for this product
 import Components from "views/Components/Components.js";
 import LandingPage from "views/LandingPage/LandingPage.js";
@@ -22,23 +25,33 @@ var hist = createBrowserHistory();
 
 export default function App(props) {
   return (
-    <AuthProvider>
-      <Router history={hist}>
-        <Switch>
-          <Route path="/post-a-job" component={PostAJob} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/applicants" component={Applicants} />
-          <Route path="/jobs" component={Jobs} />
-          <Route path="/job" component={JobDetails} />
-          <Route path="/apply" component={JobApply} />
-          <Route path="/applicants" component={Applicants} />
-          {/* <Route path="/landing-page" component={LandingPage} />
+    <SnackbarProvider
+      maxSnack={4}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "center",
+      }}
+      TransitionComponent={Slide}
+      style={{ marginTop: "0px" }}
+    >
+      <AuthProvider>
+        <Router history={hist}>
+          <Switch>
+            <Route path="/post-a-job" component={PostAJob} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/applicants" component={Applicants} />
+            <Route path="/jobs" component={Jobs} />
+            <Route path="/job" component={JobDetails} />
+            <Route path="/apply" component={JobApply} />
+            <Route path="/applicants" component={Applicants} />
+            {/* <Route path="/landing-page" component={LandingPage} />
           <Route path="/profile-page" component={ProfilePage} />
           <Route path="/login-page" component={LoginPage} />
           <Route path="/components" component={Components} /> */}
-          <Route path="/" component={RemoteUpLanding} />
-        </Switch>
-      </Router>
-    </AuthProvider>
+            <Route path="/" component={RemoteUpLanding} />
+          </Switch>
+        </Router>
+      </AuthProvider>
+    </SnackbarProvider>
   );
 }

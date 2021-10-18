@@ -20,6 +20,7 @@ import Done from "@material-ui/icons/Done";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import Slide from "@material-ui/core/Slide";
+import { useSnackbar } from "notistack";
 
 // core components
 import Header from "components/Header/Header.js";
@@ -46,20 +47,11 @@ const dashboardRoutes = [];
 const useStyles = makeStyles(styles);
 const useTableStyles = makeStyles(tableStyle);
 
-function TransitionRight(props) {
-  return <Slide {...props} direction="left" />;
-}
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
 function Status(props) {
   const [edit, setEdit] = React.useState(false);
   const [inputText, setInputText] = React.useState("");
   const [status, setStatus] = React.useState(props.status);
-
-  const [open, setOpen] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   // const handleClick = () => {
   //   setOpen(true);
@@ -78,9 +70,7 @@ function Status(props) {
   }, [open]);
 
   const handleSuccess = () => {
-    if (!open) {
-      setOpen(true);
-    }
+    enqueueSnackbar("The status have been changed.", { variant: "success" });
     setEdit(false);
     setStatus(inputText);
   };
@@ -122,22 +112,6 @@ function Status(props) {
     </>
   ) : (
     <>
-      <Snackbar
-        sx={{ marginTop: "100px" }}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={open}
-        TransitionComponent={TransitionRight}
-        autoHideDuration={6000}
-        onClose={handleClose}
-      >
-        <Alert
-          onClose={handleClose}
-          sx={{ backgroundColor: "#4caf50", fontFamily: "Roboto Slab" }}
-          severity="success"
-        >
-          The status have been changed.
-        </Alert>
-      </Snackbar>
       {status}
       <Button
         style={{ marginLeft: "10px" }}
