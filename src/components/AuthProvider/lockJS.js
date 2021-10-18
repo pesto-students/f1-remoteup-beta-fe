@@ -18,7 +18,7 @@ const lockJS = new Auth0Lock(
       redirectUrl: "http://localhost:3000/",
       sso: false,
       autoParseHash: true,
-      audience: "https://remoteup-jobseeker.com",
+      audience: process.env.REACT_APP_AUTH0_AUDIENCE_JS,
     },
     languageDictionary: {
       title: "Log In as Jobseeker",

@@ -30,7 +30,7 @@ const lockRE = new Auth0Lock(
       redirectUrl: "http://localhost:3000/",
       sso: false,
       autoParseHash: true,
-      audience: "https://remoteup-recruiter.com",
+      audience: process.env.REACT_APP_AUTH0_AUDIENCE_RE,
     },
     languageDictionary: {
       // emailInputPlaceholder: "name@companyName.com",
