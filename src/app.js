@@ -4,8 +4,10 @@ import { Router, Route, Switch } from "react-router-dom";
 
 import "assets/scss/material-kit-react.scss?v=1.10.0";
 
-import { SnackbarProvider } from "notistack";
+import { SnackbarProvider, useSnackbar } from "notistack";
 import Slide from "@material-ui/core/Slide";
+import { IconButton } from "@material-ui/core";
+import { Close as IconClose } from "@material-ui/icons";
 
 // pages for this product
 import Components from "views/Components/Components.js";
@@ -23,9 +25,29 @@ import { AuthProvider } from "components/AuthProvider/AuthProvider";
 
 var hist = createBrowserHistory();
 
+function SnackbarCloseButton({ snackbarKey }) {
+  const { closeSnackbar } = useSnackbar();
+
+  return (
+    <IconButton onClick={() => closeSnackbar(snackbarKey)}>
+      <IconClose
+        style={{
+          color: "white",
+          width: "14px",
+          height: "14px",
+          verticalAlign: "middle",
+        }}
+      />
+    </IconButton>
+  );
+}
+
 export default function App(props) {
   return (
     <SnackbarProvider
+      action={(snackbarKey) => (
+        <SnackbarCloseButton snackbarKey={snackbarKey} />
+      )}
       maxSnack={4}
       anchorOrigin={{
         vertical: "bottom",
