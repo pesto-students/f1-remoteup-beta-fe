@@ -1,0 +1,44 @@
+import React, { useEffect } from "react";
+import { createBrowserHistory } from "history";
+import { Router, Route, Switch } from "react-router-dom";
+
+import "assets/scss/material-kit-react.scss?v=1.10.0";
+
+// pages for this product
+import Components from "views/Components/Components.js";
+import LandingPage from "views/LandingPage/LandingPage.js";
+import ProfilePage from "views/ProfilePage/ProfilePage.js";
+import LoginPage from "views/LoginPage/LoginPage.js";
+import RemoteUpLanding from "views/LandingPage/LandingPage";
+import PostAJob from "views/PostAJob/PostAJob";
+import Dashboard from "views/Dashboard/Dashboard";
+import Jobs from "views/Jobs/Jobs";
+import JobApply from "views/JobApply/JobApply";
+import JobDetails from "views/JobDetails/JobDetails";
+import Applicants from "views/Applicants/Applicants";
+import { AuthProvider } from "components/AuthProvider/AuthProvider";
+
+var hist = createBrowserHistory();
+
+export default function App(props) {
+  return (
+    <AuthProvider>
+      <Router history={hist}>
+        <Switch>
+          <Route path="/post-a-job" component={PostAJob} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/applicants" component={Applicants} />
+          <Route path="/jobs" component={Jobs} />
+          <Route path="/job" component={JobDetails} />
+          <Route path="/apply" component={JobApply} />
+          <Route path="/applicants" component={Applicants} />
+          {/* <Route path="/landing-page" component={LandingPage} />
+          <Route path="/profile-page" component={ProfilePage} />
+          <Route path="/login-page" component={LoginPage} />
+          <Route path="/components" component={Components} /> */}
+          <Route path="/" component={RemoteUpLanding} />
+        </Switch>
+      </Router>
+    </AuthProvider>
+  );
+}
