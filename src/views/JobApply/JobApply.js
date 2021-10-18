@@ -57,7 +57,6 @@ import WorkSection from "../LandingPage/Sections/WorkSection.js";
 import { useFormik, ErrorMessage } from "formik";
 import { FormHelperText } from "@material-ui/core";
 import * as yup from "yup";
-import "yup-phone";
 
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
 
