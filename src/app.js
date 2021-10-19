@@ -8,6 +8,7 @@ import { SnackbarProvider, useSnackbar } from "notistack";
 import Slide from "@material-ui/core/Slide";
 import { IconButton } from "@material-ui/core";
 import { Close as IconClose } from "@material-ui/icons";
+import SuccessIcon from "@mui/material/internal/svg-icons/SuccessOutlined";
 
 // pages for this product
 import Components from "views/Components/Components.js";
@@ -52,6 +53,9 @@ export default function App(props) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SnackbarProvider
+          iconVariant={{
+            success: <SuccessIcon style={{ marginRight: "10px" }} />,
+          }}
           action={(snackbarKey) => (
             <SnackbarCloseButton snackbarKey={snackbarKey} />
           )}
@@ -61,7 +65,7 @@ export default function App(props) {
             horizontal: "right",
           }}
           TransitionComponent={Slide}
-          style={{ marginTop: "0px" }}
+          style={{ fontFamily: "Roboto Slab" }}
         >
           <Router history={hist}>
             <Switch>
