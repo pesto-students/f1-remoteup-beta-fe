@@ -25,15 +25,23 @@ import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 import FormSection from "./Sections/FormSection.js";
 
+import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useQuery } from "react-query";
+import axios from "axios";
+
 const dashboardRoutes = [];
 
 const useStyles = makeStyles(styles);
-import { useAuth } from "components/AuthProvider/AuthProvider.js";
 
 export default function PostAJob(props) {
   const classes = useStyles();
   const { state } = useAuth();
   const { ...rest } = props;
+  const { isLoading, error, data } = useQuery("Home", () =>
+    fetch("http://127.0.0.1:8000/jobseeker/job/homejobs").then((res) =>
+      res.json()
+    )
+  );
   return state.isAuthenticated && state.role === "Recruiter" ? (
     <div>
       <Header

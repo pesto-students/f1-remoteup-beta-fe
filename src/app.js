@@ -23,7 +23,12 @@ import JobDetails from "views/JobDetails/JobDetails";
 import Applicants from "views/Applicants/Applicants";
 import { AuthProvider } from "components/AuthProvider/AuthProvider";
 
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
+
 var hist = createBrowserHistory();
+
+const queryClient = new QueryClient();
 
 function SnackbarCloseButton({ snackbarKey }) {
   const { closeSnackbar } = useSnackbar();
@@ -44,36 +49,39 @@ function SnackbarCloseButton({ snackbarKey }) {
 
 export default function App(props) {
   return (
-    <SnackbarProvider
-      action={(snackbarKey) => (
-        <SnackbarCloseButton snackbarKey={snackbarKey} />
-      )}
-      maxSnack={4}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "center",
-      }}
-      TransitionComponent={Slide}
-      style={{ marginTop: "0px" }}
-    >
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router history={hist}>
-          <Switch>
-            <Route path="/post-a-job" component={PostAJob} />
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/applicants" component={Applicants} />
-            <Route path="/jobs" component={Jobs} />
-            <Route path="/job" component={JobDetails} />
-            <Route path="/apply" component={JobApply} />
-            <Route path="/applicants" component={Applicants} />
-            {/* <Route path="/landing-page" component={LandingPage} />
+        <SnackbarProvider
+          action={(snackbarKey) => (
+            <SnackbarCloseButton snackbarKey={snackbarKey} />
+          )}
+          maxSnack={4}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          TransitionComponent={Slide}
+          style={{ marginTop: "0px" }}
+        >
+          <Router history={hist}>
+            <Switch>
+              <Route path="/post-a-job" component={PostAJob} />
+              <Route path="/dashboard" component={Dashboard} />
+              <Route path="/applicants" component={Applicants} />
+              <Route path="/jobs" component={Jobs} />
+              <Route path="/job" component={JobDetails} />
+              <Route path="/apply" component={JobApply} />
+              <Route path="/applicants" component={Applicants} />
+              {/* <Route path="/landing-page" component={LandingPage} />
           <Route path="/profile-page" component={ProfilePage} />
           <Route path="/login-page" component={LoginPage} />
           <Route path="/components" component={Components} /> */}
-            <Route path="/" component={RemoteUpLanding} />
-          </Switch>
-        </Router>
+              <Route path="/" component={RemoteUpLanding} />
+            </Switch>
+          </Router>
+        </SnackbarProvider>
       </AuthProvider>
-    </SnackbarProvider>
+      <ReactQueryDevtools initialIsOpen={true} />
+    </QueryClientProvider>
   );
 }

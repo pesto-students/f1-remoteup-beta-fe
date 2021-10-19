@@ -22,6 +22,9 @@ import logo from "./logo1.jpeg";
 import everli from "./everli.png";
 import podsights from "./podsights.jpeg";
 import toptal from "./toptal.png";
+import axios from "axios";
+
+import { useQuery } from "react-query";
 
 const cardStyles = {
   ...imagesStyles,
@@ -36,6 +39,13 @@ export default function JobsSection(props) {
   const classes = useStyles();
   const cardClasses = useCardStyles();
   const typoClasses = useTypoStyles();
+
+  const { isLoading, error, data } = useQuery("jobsHome", () =>
+    fetch("http://127.0.0.1:8000/jobseeker/job/homejobs").then((res) =>
+      res.json()
+    )
+  );
+
   return (
     <div className={classes.section}>
       <GridContainer justify="center" alignItems="center">
