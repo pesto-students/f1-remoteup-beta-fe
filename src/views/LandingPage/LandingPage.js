@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // @material-ui/core components
@@ -69,11 +70,12 @@ export default function LandingPage(props) {
               {state.isAuthenticated ? (
                 state.role === "Recruiter" ? (
                   <Button
+                    component={Link}
                     round
                     color="info"
                     size="lg"
                     // onClick={() => lockRE.show()}
-                    href="/post-a-job"
+                    to="/post-a-job"
                     // target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -85,6 +87,7 @@ export default function LandingPage(props) {
                 )
               ) : (
                 <Button
+                  component={Link}
                   round
                   color="info"
                   size="lg"
@@ -103,7 +106,7 @@ export default function LandingPage(props) {
       </Parallax>
       <div className={classNames(classes.main, classes.mainRaised)}>
         <div className={classes.container}>
-          <JobsSection name="Jobs coming soon..." />
+          <JobsSection />
           {/* <ProductSection /> */}
           {/* <TeamSection /> */}
         </div>

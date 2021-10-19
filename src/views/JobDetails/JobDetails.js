@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // @material-ui/core components
@@ -174,7 +174,7 @@ export default function JobDetails(props) {
                 <BookmarkBorder />
                 <span className="right-link">Save</span>
               </Button>
-              <Button fullWidth color="facebook">
+              <Button component={Link} to="/apply" fullWidth color="facebook">
                 <MailOutline />
                 <span className="right-link">Apply</span>
               </Button>

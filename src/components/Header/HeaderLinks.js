@@ -70,7 +70,12 @@ export default function HeaderLinks(props) {
       {/* Home link */}
       {state.isAuthenticated && location.pathname !== "/" && (
         <ListItem className={classes.listItem}>
-          <Button href="/" className={classes.navLink} color="transparent">
+          <Button
+            component={Link}
+            to="/"
+            className={classes.navLink}
+            color="transparent"
+          >
             <HomeIcon className={classes.icons} />{" "}
             <span className="right-link">Home</span>
           </Button>
@@ -81,7 +86,8 @@ export default function HeaderLinks(props) {
       {state.isAuthenticated && state.role === "Recruiter" && (
         <ListItem className={classes.listItem}>
           <Button
-            href="/post-a-job"
+            component={Link}
+            to="/post-a-job"
             className={
               location.pathname === "/post-a-job"
                 ? classes.navLink + " " + classes.navLinkActive
@@ -134,7 +140,8 @@ export default function HeaderLinks(props) {
       {state.isAuthenticated && state.role === "Recruiter" && (
         <ListItem className={classes.listItem}>
           <Button
-            href="/dashboard"
+            component={Link}
+            to="/dashboard"
             className={
               location.pathname === "/dashboard"
                 ? classes.navLink + " " + classes.navLinkActive
@@ -151,7 +158,8 @@ export default function HeaderLinks(props) {
       {state.isAuthenticated && state.role === "Jobseeker" && (
         <ListItem className={classes.listItem}>
           <Button
-            href="/jobs"
+            component={Link}
+            to="/jobs"
             className={
               location.pathname === "/jobs"
                 ? classes.navLink + " " + classes.navLinkActive
