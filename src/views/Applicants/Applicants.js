@@ -57,17 +57,17 @@ function Status(props) {
   //   setOpen(true);
   // };
 
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+  // const handleClose = (event, reason) => {
+  //   if (reason === "clickaway") {
+  //     return;
+  //   }
 
-    setOpen(false);
-  };
+  //   setOpen(false);
+  // };
 
-  useEffect(() => {
-    console.log("DOne");
-  }, [open]);
+  // useEffect(() => {
+  //   console.log("DOne");
+  // }, [open]);
 
   const handleSuccess = () => {
     enqueueSnackbar("The status have been changed.", { variant: "success" });
