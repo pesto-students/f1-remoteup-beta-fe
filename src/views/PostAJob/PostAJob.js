@@ -37,11 +37,7 @@ export default function PostAJob(props) {
   const classes = useStyles();
   const { state } = useAuth();
   const { ...rest } = props;
-  const { isLoading, error, data } = useQuery("Home", () =>
-    fetch("http://127.0.0.1:8000/jobseeker/job/homejobs").then((res) =>
-      res.json()
-    )
-  );
+
   return state.isAuthenticated && state.role === "Recruiter" ? (
     <div>
       <Header

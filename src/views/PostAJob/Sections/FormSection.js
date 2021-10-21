@@ -37,6 +37,11 @@ import { FormHelperText } from "@material-ui/core";
 import * as yup from "yup";
 import { borderColor } from "@mui/system";
 
+import { useMutation } from "react-query";
+import { useAuth } from "components/AuthProvider/AuthProvider";
+import axios from "axios";
+import { useSnackbar } from "notistack";
+
 const useStyles = makeStyles(styles);
 const useSelectStyles = makeStyles(customSelectStyle);
 const useRadioStyles = makeStyles(radioStyles);
@@ -55,25 +60,25 @@ const validationSchema = yup.object({
     .trim()
     .min(50, "Must be atleast 50 characters long")
     .required("Job Description is required"),
-  howToApply: yup.string().required("Choose a option"),
+  applyType: yup.string().required("Choose a option"),
   applyValue: yup
     .string()
     .trim()
-    .when("howToApply", {
-      is: (howToApply) => howToApply === "Email",
+    .when("applyType", {
+      is: (applyType) => applyType === "Email",
       then: yup
         .string()
         .email("Enter a valid Email")
         .required("Email is required"),
       // otherwise: yup.string().url().required(" is required"),
     })
-    .when("howToApply", {
-      is: (howToApply) => howToApply === "URL",
+    .when("applyType", {
+      is: (applyType) => applyType === "URL",
       then: yup.string().url("Enter a valid URL").required("URL is required"),
       // otherwise: yup.string().url().required("Value is required"),
     }),
   companyName: yup.string().trim().required("Name is required"),
-  companyLogo: yup
+  logoFile: yup
     .mixed()
     .required("Logo is required")
     .test(
@@ -92,7 +97,7 @@ const validationSchema = yup.object({
   //   (value) => value && value.size <= 1000000
   // )
 
-  // .test("companyLogo", "Unsupported File Format", value && (value) =>
+  // .test("logoFile", "Unsupported File Format", value && (value) =>
   //   SUPPORTED_FORMATS.includes(value.type)
   // ),
   companyWebsite: yup
@@ -109,7 +114,38 @@ const validationSchema = yup.object({
 });
 
 export default function FormSection(props) {
-  const planPrice = { 1: 199, 2: 299, 3: 399 };
+  const { enqueueSnackbar } = useSnackbar();
+  const { state } = useAuth();
+  const mutation = useMutation(
+    (newJob) =>
+      // axios.post(
+      //   "http://127.0.0.1:8000/recruiter/job/postjob",
+      //   {
+      //     Authorization: `Bearer ${state.accessToken}`,
+      //     "Content-Type": "application/json",
+      //   },
+      //   newJob
+      // ),
+      {
+        return fetch("http://127.0.0.1:8000/recruiter/job/postjob", {
+          method: "post",
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+            "Content-Type": "application/json",
+          }),
+          body: newJob,
+        });
+      },
+    {
+      onSuccess: () => {
+        // Success notification
+        enqueueSnackbar("The job have been posted.", {
+          variant: "success",
+        });
+      },
+    }
+  );
+  const planPrice = { "1 Month": 199, "2 Month": 299, "3 Month": 399 };
   const formik = useFormik({
     initialValues: {
       position: "",
@@ -117,34 +153,38 @@ export default function FormSection(props) {
       jobType: "",
       salary: "",
       candidateRegion: "",
-      howToApply: "",
+      applyType: "",
       applyValue: "",
       jobDescription: "",
       companyName: "",
-      companyLogo: null,
+      companyLogo: "",
+      logoFile: null,
       companyWebsite: "",
       companyTagLine: "",
       companyDescription: "",
       planType: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      values["companyLogoName"] = values.companyLogo.name;
-      values["companyLogoType"] = values.companyLogo.type;
-      values["companyLogoSize"] = values.companyLogo.size;
-      let file = values.companyLogo; // e.target.files[0];
+    onSubmit: (values, { resetForm }) => {
+      // values["logoFileName"] = values.logoFile.name;
+      // values["logoFileType"] = values.logoFile.type;
+      // values["logoFileSize"] = values.logoFile.size;
+      let file = values.logoFile; // e.target.files[0];
       let reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onloadend = () => {
-        values["base64"] = reader.result;
+        values.companyLogo = reader.result;
         // this.setState({
         //   file: file,
         //   base64: reader.result,
         // });
-        alert(JSON.stringify(values, null, 2)); // POST REQUEST
+        // alert(JSON.stringify(values, null, 2)); // POST REQUEST
+        mutation.mutate(JSON.stringify(values, null, 2));
+        resetForm();
       };
     },
   });
+
   // const [selectedEnabled, setSelectedEnabled] = React.useState("");
   const classes = useStyles();
   const selectClasses = useSelectStyles();
@@ -427,7 +467,11 @@ export default function FormSection(props) {
                 </h3>
                 <CustomInput
                   inputProps={{
+                    name: "salary",
+                    id: "salary",
                     placeholder: "e.g. $40k-50k/year..",
+                    value: formik.values.salary,
+                    onChange: formik.handleChange,
                   }}
                   style={{ marginTop: "0px" }}
                   id="salary"
@@ -486,7 +530,7 @@ export default function FormSection(props) {
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
 
-              {/* How to Apply section */}
+              {/* How to Apply section [̉̉̉̉applyType] */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem xs={10} sm={10} md={10}>
                 <h3
@@ -502,11 +546,11 @@ export default function FormSection(props) {
                 </h3>
 
                 <RadioGroup
-                  name="howToApply"
-                  value={formik.values.howToApply}
+                  name="applyType"
+                  value={formik.values.applyType}
                   onChange={(event) => {
                     formik.setFieldValue(
-                      "howToApply",
+                      "applyType",
                       event.currentTarget.value
                     );
                   }}
@@ -521,10 +565,10 @@ export default function FormSection(props) {
                     value="ATS"
                     control={
                       <Radio
-                        checked={formik.values.howToApply === "ATS"}
+                        checked={formik.values.applyType === "ATS"}
                         onChange={formik.handleChange}
                         value="ATS"
-                        name={formik.values.howToApply}
+                        name={formik.values.applyType}
                         aria-label="ATS"
                         icon={
                           <FiberManualRecord
@@ -551,10 +595,10 @@ export default function FormSection(props) {
                     value="URL"
                     control={
                       <Radio
-                        checked={formik.values.howToApply === "URL"}
+                        checked={formik.values.applyType === "URL"}
                         onChange={formik.handleChange}
                         // value="b"
-                        // name={formik.values.howToApply}
+                        // name={formik.values.applyType}
                         aria-label="URL"
                         icon={
                           <FiberManualRecord
@@ -581,10 +625,10 @@ export default function FormSection(props) {
                     value="Email"
                     control={
                       <Radio
-                        checked={formik.values.howToApply === "Email"}
+                        checked={formik.values.applyType === "Email"}
                         onChange={formik.handleChange}
                         // value="b"
-                        // name={formik.values.howToApply}
+                        // name={formik.values.applyType}
                         aria-label="B"
                         icon={
                           <FiberManualRecord
@@ -608,13 +652,13 @@ export default function FormSection(props) {
                     label={<span style={{ color: "#333" }}>Email</span>}
                   />
                 </RadioGroup>
-                {(formik.values.howToApply === "Email" ||
-                  formik.values.howToApply === "URL") && (
+                {(formik.values.applyType === "Email" ||
+                  formik.values.applyType === "URL") && (
                   <CustomInput
                     inputProps={{
                       id: "applyValue",
                       placeholder:
-                        formik.values.howToApply === "URL"
+                        formik.values.applyType === "URL"
                           ? "URL (http://) where candidates can apply to this job"
                           : "email (@) where candidates can apply to this job",
                       name: "applyValue",
@@ -644,11 +688,10 @@ export default function FormSection(props) {
                 <FormHelperText
                   style={{ marginTop: "14px" }}
                   error={
-                    formik.touched.howToApply &&
-                    Boolean(formik.errors.howToApply)
+                    formik.touched.applyType && Boolean(formik.errors.applyType)
                   }
                 >
-                  {formik.touched.howToApply && formik.errors.howToApply}
+                  {formik.touched.applyType && formik.errors.applyType}
                 </FormHelperText>
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
@@ -807,23 +850,26 @@ export default function FormSection(props) {
                   formControlProps={{
                     fullWidth: true,
                     error:
-                      formik.touched.companyLogo &&
-                      Boolean(formik.errors.companyLogo),
+                      formik.touched.logoFile &&
+                      Boolean(formik.errors.logoFile),
                   }}
                   onChange={function (event) {
                     formik.setFieldValue(
-                      "companyLogo",
+                      "logoFile",
                       event.currentTarget.files[0]
                     );
                   }}
                   inputProps={{
                     placeholder: "Format: jpg/png, Size: Max 1 MB",
-                    name: "companyLogo",
+                    name: "logoFile",
+                    onChange: formik.handleChange,
                     onBlur: formik.handleBlur,
-                    // value: formik.values.companyLogo,
+                    value: formik.values.logoFile
+                      ? formik.values.logoFile.name
+                      : "",
                     error:
-                      formik.touched.companyLogo &&
-                      Boolean(formik.errors.companyLogo),
+                      formik.touched.logoFile &&
+                      Boolean(formik.errors.logoFile),
                   }}
                   endButton={{
                     buttonProps: {
@@ -832,7 +878,7 @@ export default function FormSection(props) {
                       justIcon: true,
                       fileButton: true,
                       onBlur: formik.handleBlur,
-                      name: "companyLogo",
+                      name: "logoFile",
                     },
                     icon: <Image />,
                   }}
@@ -840,26 +886,25 @@ export default function FormSection(props) {
                 <FormHelperText
                   style={{ marginTop: "-14px" }}
                   error={
-                    formik.touched.companyLogo &&
-                    Boolean(formik.errors.companyLogo)
+                    formik.touched.logoFile && Boolean(formik.errors.logoFile)
                   }
                 >
-                  {formik.touched.companyLogo && formik.errors.companyLogo}
+                  {formik.touched.logoFile && formik.errors.logoFile}
                 </FormHelperText>
                 {/* <CustomInput
                   inputProps={{
                     placeholder: "",
                     type: "file",
-                    name: "companyLogo",
+                    name: "logoFile",
                     onChange: formik.handleChange,
                     onBlur: formik.handleBlur,
-                    value: formik.values.companyLogo,
+                    value: formik.values.logoFile,
                     error:
-                      formik.touched.companyLogo &&
-                      Boolean(formik.errors.companyLogo),
+                      formik.touched.logoFile &&
+                      Boolean(formik.errors.logoFile),
                   }}
                   style={{ marginTop: "0px" }}
-                  id="companyLogo"
+                  id="logoFile"
                   formControlProps={{
                     fullWidth: true,
                   }}
@@ -1071,7 +1116,7 @@ export default function FormSection(props) {
                         root: selectClasses.selectMenuItem,
                         selected: selectClasses.selectMenuItemSelected,
                       }}
-                      value="1"
+                      value="1 Month"
                     >
                       1 Month
                     </MenuItem>
@@ -1080,7 +1125,7 @@ export default function FormSection(props) {
                         root: selectClasses.selectMenuItem,
                         selected: selectClasses.selectMenuItemSelected,
                       }}
-                      value="2"
+                      value="2 Month"
                     >
                       2 Month
                     </MenuItem>
@@ -1089,7 +1134,7 @@ export default function FormSection(props) {
                         root: selectClasses.selectMenuItem,
                         selected: selectClasses.selectMenuItemSelected,
                       }}
-                      value="3"
+                      value="3 Month"
                     >
                       3 Month
                     </MenuItem>
