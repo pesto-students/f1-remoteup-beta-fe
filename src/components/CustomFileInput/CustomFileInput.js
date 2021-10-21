@@ -86,7 +86,7 @@ export default function CustomFileInput(props) {
         inputProps={{
           ...inputProps,
           onClick: onFocus,
-          value: fileNames,
+          // value: fileNames,
           endAdornment: buttonEnd,
           startAdornment: buttonStart,
         }}
