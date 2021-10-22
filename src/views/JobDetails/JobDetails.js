@@ -50,6 +50,7 @@ import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useQuery } from "react-query";
 
 const dashboardRoutes = [];
 
@@ -58,11 +59,20 @@ const cardStyles = {
   cardTitle,
 };
 
+function ScrollToTopOnMount() {
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  return null;
+}
+
 const useStyles = makeStyles(styles);
 const useCardStyles = makeStyles(cardStyles);
 const useTypoStyles = makeStyles(typoStyles);
 
 export default function JobDetails(props) {
+  const jobId = props.match.params.jobId;
   const classes = useStyles();
   const cardClasses = useCardStyles();
   const typoClasses = useTypoStyles();
@@ -70,7 +80,26 @@ export default function JobDetails(props) {
   const { state } = useAuth();
   const { ...rest } = props;
   console.log(state.isAuthenticated);
-  return state.isAuthenticated && state.role === "Jobseeker" ? (
+
+  const { isLoading, error, data } = useQuery(`job-${jobId}`, () =>
+    fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`, {
+      method: "get",
+      headers: new Headers({
+        Authorization: `Bearer ${state.accessToken}`,
+        "Content-Type": "application/json",
+      }),
+    }).then((res) => res.json())
+  );
+
+  if (isLoading) {
+    return "...isLoading";
+  }
+
+  if (error) {
+    return "An error occured " + error.message;
+  }
+
+  return (
     <div>
       <Header
         color="info"
@@ -84,6 +113,7 @@ export default function JobDetails(props) {
         // }}
         {...rest}
       />
+      <ScrollToTopOnMount />
       <div className={classNames(classes.mainDiv)}>
         <div className={classes.container} style={{ minHeight: "900px" }}>
           {/* <ProductSection />
@@ -102,7 +132,7 @@ export default function JobDetails(props) {
             <GridItem xs={8} sm={8} md={8} lg={8} style={{ textAlign: "left" }}>
               <img
                 style={{ height: "90px", width: "90px" }}
-                src={podsights}
+                src={data.payload.jobData.companyLogo}
                 alt="..."
                 className={
                   typoClasses.imgRaised +
@@ -120,7 +150,7 @@ export default function JobDetails(props) {
                 }}
                 className="roboto-slab"
               >
-                Podsights
+                {data.payload.jobData.companyName}
               </span>
             </GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
@@ -140,22 +170,26 @@ export default function JobDetails(props) {
                 }}
                 className="roboto-slab"
               >
-                Senior React Engineer
+                {data.payload.jobData.position}
               </h3>
               <h5 className="roboto-slab">
                 <Category style={{ verticalAlign: "middle" }} />
                 <span style={{ verticalAlign: "middle" }}>
                   {" "}
-                  Software Development &nbsp;&nbsp;{" "}
+                  {data.payload.jobData.category} &nbsp;&nbsp;{" "}
                 </span>
                 <Schedule style={{ verticalAlign: "middle" }} />
-                <span style={{ verticalAlign: "middle" }}> Full-Time</span>
+                <span style={{ verticalAlign: "middle" }}>
+                  {" "}
+                  {data.payload.jobData.jobType}
+                </span>
               </h5>
               <h5 className="roboto-slab">
                 <World style={{ verticalAlign: "middle" }} />
                 <span style={{ verticalAlign: "middle" }}>
                   {" "}
-                  Anywhere in the world
+                  {data.payload.jobData.candidateRegion ||
+                    "Anywhere in the world"}
                 </span>
               </h5>
             </GridItem>
@@ -182,7 +216,7 @@ export default function JobDetails(props) {
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
             <GridItem xs={8} sm={8} md={8} lg={8}>
-              <h4
+              {/* <h4
                 className="roboto-slab"
                 style={{
                   fontSize: "1.27rem",
@@ -191,8 +225,27 @@ export default function JobDetails(props) {
                 }}
               >
                 Company Description
-              </h4>
-              <p className="roboto-slab" style={{ fontSize: "14px" }}>
+              </h4> */}
+              <div
+                style={{
+                  fontSize: "",
+                  paddingTop: "30px",
+                }}
+                className="roboto-slab"
+                dangerouslySetInnerHTML={{
+                  __html: data.payload.jobData.companyDescription,
+                }}
+              ></div>
+
+              <div
+                style={{ fontSize: "1rem" }}
+                className="roboto-slab"
+                dangerouslySetInnerHTML={{
+                  __html: data.payload.jobData.jobDescription,
+                }}
+              ></div>
+
+              {/* <p className="roboto-slab" style={{ fontSize: "14px" }}>
                 Podsights is a small, distributed organization seeking a Data
                 Engineer to join our growing team! Here's a little about us, a
                 little about what we believe, and what we are looking for.
@@ -305,7 +358,7 @@ export default function JobDetails(props) {
                     delivery{" "}
                   </li>
                 </ul>
-              </p>
+              </p> */}
             </GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
             <GridItem xs={4} sm={4} md={4} lg={4}></GridItem>
@@ -330,11 +383,5 @@ export default function JobDetails(props) {
       </div>
       <RFooter />
     </div>
-  ) : (
-    <Redirect
-      to={{
-        pathname: "/",
-      }}
-    />
   );
 }
