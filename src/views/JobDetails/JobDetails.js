@@ -20,6 +20,7 @@ import MailOutline from "@material-ui/icons/MailOutline";
 import Mail from "@material-ui/icons/Mail";
 import Send from "@material-ui/icons/Send";
 
+import Money from "assets/img/cash-outline.svg";
 // import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 
 import Card from "components/Card/Card.js";
@@ -188,6 +189,24 @@ export default function JobDetails(props) {
                   {data.payload.jobData.candidateRegion ||
                     "Anywhere in the world"}
                 </span>
+                &nbsp;&nbsp;{" "}
+                {data.payload.jobData.salary && (
+                  <>
+                    <img
+                      src={Money}
+                      style={{
+                        height: "24px",
+                        width: "24px",
+                        filter:
+                          "invert(29%) sepia(15%) saturate(700%) hue-rotate(174deg) brightness(91%) contrast(97%)",
+                      }}
+                    />
+                    <span style={{ verticalAlign: "middle" }}>
+                      {" "}
+                      {data.payload.jobData.salary}
+                    </span>
+                  </>
+                )}
               </h5>
             </GridItem>
             <GridItem

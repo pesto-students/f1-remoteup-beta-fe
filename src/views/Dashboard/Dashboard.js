@@ -15,6 +15,9 @@ import Person from "@material-ui/icons/Person";
 import Edit from "@material-ui/icons/Edit";
 import Close from "@material-ui/icons/Close";
 
+import Live from "assets/img/pulse-outline.svg";
+import AppTray from "assets/img/file-tray-full-outline.svg";
+
 // core components
 import Header from "components/Header/Header.js";
 import RFooter from "components/Footer/RFooter.js";
@@ -109,6 +112,16 @@ export default function Dashboard(props) {
                 }}
                 className="roboto-slab"
               >
+                <img
+                  src={Live}
+                  style={{
+                    width: "28px",
+                    height: "28px",
+                    filter:
+                      "invert(29%) sepia(15%) saturate(700%) hue-rotate(174deg) brightness(91%) contrast(97%)",
+                  }}
+                />
+                {"  "}
                 Active Jobs
               </h3>
             </GridItem>
@@ -137,6 +150,16 @@ export default function Dashboard(props) {
                 }}
                 className="roboto-slab"
               >
+                <img
+                  src={AppTray}
+                  style={{
+                    width: "28px",
+                    height: "28px",
+                    filter:
+                      "invert(29%) sepia(15%) saturate(700%) hue-rotate(174deg) brightness(91%) contrast(97%)",
+                  }}
+                />
+                {"  "}
                 Applications Received
               </h3>
 
