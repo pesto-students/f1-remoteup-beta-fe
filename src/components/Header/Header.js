@@ -46,7 +46,7 @@ export default function Header(props) {
       document.body
         .getElementsByTagName("header")[0]
         .classList.add(classes[changeColorOnScroll.color]);
-    } else {
+    } else if (document.body.getElementsByTagName("header")[0]) {
       document.body
         .getElementsByTagName("header")[0]
         .classList.add(classes[color]);
