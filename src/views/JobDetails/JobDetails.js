@@ -50,6 +50,7 @@ import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { lockJS } from "components/AuthProvider/lockJS";
 import { useQuery } from "react-query";
 
 const dashboardRoutes = [];
@@ -200,14 +201,39 @@ export default function JobDetails(props) {
                 verticalAlign: "middle !important",
               }}
             >
-              <Button fullWidth color="info">
-                <BookmarkBorder />
-                <span className="right-link">Save</span>
-              </Button>
-              <Button component={Link} to="/apply" fullWidth color="facebook">
-                <MailOutline />
-                <span className="right-link">Apply</span>
-              </Button>
+              {!state.isAuthenticated && (
+                <>
+                  <Button onClick={() => lockJS.show()} fullWidth color="info">
+                    <BookmarkBorder />
+                    <span className="right-link">Save</span>
+                  </Button>
+                  <Button
+                    onClick={() => lockJS.show()}
+                    fullWidth
+                    color="facebook"
+                  >
+                    <MailOutline />
+                    <span className="right-link">Apply</span>
+                  </Button>
+                </>
+              )}
+              {state.role === "Jobseeker" && (
+                <>
+                  <Button fullWidth color="info">
+                    <BookmarkBorder />
+                    <span className="right-link">Save</span>
+                  </Button>
+                  <Button
+                    component={Link}
+                    to={`/apply/${jobId}`}
+                    fullWidth
+                    color="facebook"
+                  >
+                    <MailOutline />
+                    <span className="right-link">Apply</span>
+                  </Button>
+                </>
+              )}
             </GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
@@ -359,16 +385,41 @@ export default function JobDetails(props) {
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
             <GridItem xs={4} sm={4} md={4} lg={4}></GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2} style={{ marginTop: "45px" }}>
-              <Button fullWidth color="info">
-                <BookmarkBorder />
-                <span className="right-link">Save</span>
-              </Button>
+              {!state.isAuthenticated && (
+                <Button onClick={() => lockJS.show()} fullWidth color="info">
+                  <BookmarkBorder />
+                  <span className="right-link">Save</span>
+                </Button>
+              )}
+              {state.role === "Jobseeker" && (
+                <Button fullWidth color="info">
+                  <BookmarkBorder />
+                  <span className="right-link">Save</span>
+                </Button>
+              )}
             </GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2} style={{ marginTop: "45px" }}>
-              <Button fullWidth color="facebook">
-                <MailOutline />
-                <span className="right-link">Apply</span>
-              </Button>
+              {!state.isAuthenticated && (
+                <Button
+                  onClick={() => lockJS.show()}
+                  fullWidth
+                  color="facebook"
+                >
+                  <MailOutline />
+                  <span className="right-link">Apply</span>
+                </Button>
+              )}
+              {state.role === "Jobseeker" && (
+                <Button
+                  component={Link}
+                  to={`/apply/${jobId}`}
+                  fullWidth
+                  color="facebook"
+                >
+                  <MailOutline />
+                  <span className="right-link">Apply</span>
+                </Button>
+              )}
             </GridItem>
             <GridItem xs={4} sm={4} md={4} lg={4}></GridItem>
             {/* <GridItem xs={8} sm={8} md={2} lg={2}>
