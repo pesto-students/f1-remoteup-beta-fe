@@ -82,13 +82,9 @@ export default function JobDetails(props) {
   console.log(state.isAuthenticated);
 
   const { isLoading, error, data } = useQuery(`job-${jobId}`, () =>
-    fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`, {
-      method: "get",
-      headers: new Headers({
-        Authorization: `Bearer ${state.accessToken}`,
-        "Content-Type": "application/json",
-      }),
-    }).then((res) => res.json())
+    fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
+      res.json()
+    )
   );
 
   if (isLoading) {
