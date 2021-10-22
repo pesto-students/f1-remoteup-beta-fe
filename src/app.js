@@ -73,7 +73,7 @@ export default function App(props) {
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/applicants" component={Applicants} />
               <Route path="/jobs" component={Jobs} />
-              <Route path="/job" component={JobDetails} />
+              <Route path="/job/:jobId" component={JobDetails} />
               <Route path="/apply" component={JobApply} />
               <Route path="/applicants" component={Applicants} />
               {/* <Route path="/landing-page" component={LandingPage} />
