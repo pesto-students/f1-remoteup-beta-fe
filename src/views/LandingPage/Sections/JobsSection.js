@@ -1,8 +1,11 @@
 import React from "react";
+import { Link as RouterLink } from "react-router-dom";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 
 // @material-ui/icons
+
+import { Link } from "@mui/material";
 
 // core components
 import GridContainer from "components/Grid/GridContainer.js";
@@ -23,8 +26,10 @@ import everli from "./everli.png";
 import podsights from "./podsights.jpeg";
 import toptal from "./toptal.png";
 import axios from "axios";
+import moment from "moment";
 
 import { useQuery } from "react-query";
+import { createJSDocCallbackTag } from "typescript";
 
 const cardStyles = {
   ...imagesStyles,
@@ -41,33 +46,122 @@ export default function JobsSection(props) {
   const typoClasses = useTypoStyles();
 
   const { isLoading, error, data } = useQuery("jobsHome", () =>
-    fetch("http://127.0.0.1:8000/jobseeker/job/homejobs").then((res) =>
-      res.json()
-    )
+    fetch("http://127.0.0.1:8000/public/job/homejobs").then((res) => res.json())
   );
 
+  if (isLoading) {
+    return "...isLoading";
+  }
+
+  if (error) {
+    return "An error occured " + error.message;
+  }
+
+  const jobData = data.payload.jobData;
+  const jobsCategory = [];
+  const categoryOrder = [
+    "Software Development",
+    "Customer Service",
+    "Marketing",
+  ];
+  for (let category of categoryOrder) {
+    for (let jobCategory of jobData) {
+      if (jobCategory._id === category) {
+        jobsCategory.push(jobCategory);
+      }
+    }
+  }
   return (
-    <div className={classes.section}>
+    <div
+      className={classes.section}
+      style={{ paddingTop: "20px", paddingBottom: "150px" }}
+    >
       <GridContainer justify="center" alignItems="center">
         {/* <GridItem xs={3} sm={3} md={3}></GridItem> */}
         <GridItem xs={8} sm={8} md={8}>
-          {/* Software Development */}
-          <h3 className={classes.title + " align-left"}>
-            Software Development
-            <span style={{ float: "right" }}>
-              <Button
-                style={{ margin: "0px", padding: "12px 5px" }}
-                type="button"
-                color="info"
-                simple
+          {jobsCategory.map((category) => (
+            <>
+              {/* Category Name */}
+              <h3
+                className={classes.title + " align-left"}
+                style={{ marginBottom: "20px", marginTop: "40px" }}
               >
-                <span style={{ fontSize: "13px", fontWeight: 500 }}>
-                  View All
+                {category._id}
+                <span style={{ float: "right" }}>
+                  <Button
+                    style={{ margin: "0px", padding: "12px 5px" }}
+                    type="button"
+                    color="info"
+                    simple
+                  >
+                    <span style={{ fontSize: "13px", fontWeight: 500 }}>
+                      View All
+                    </span>
+                  </Button>
                 </span>
-              </Button>
-            </span>
-          </h3>
-          <Card>
+              </h3>
+              {category.jobs.map((job) => (
+                <RouterLink to={`/job/${job._id}`} key={job._id}>
+                  <Card style={{ marginTop: "18px", marginBottom: "15px" }}>
+                    <CardBody>
+                      <GridContainer
+                        justify="flex-start"
+                        alignItems="center"
+                        className="roboto-slab"
+                        style={{ color: "#3c4858" }}
+                      >
+                        <GridItem
+                          xs={2}
+                          sm={2}
+                          md={2}
+                          style={{ paddingLeft: "0px" }}
+                        >
+                          <img
+                            src={job.companyLogo}
+                            alt="..."
+                            className={
+                              typoClasses.imgRaised +
+                              " " +
+                              typoClasses.imgRoundedCircle +
+                              " " +
+                              typoClasses.imgFluid
+                            }
+                          />
+                        </GridItem>
+                        <GridItem
+                          xs={8}
+                          sm={8}
+                          md={8}
+                          style={{ paddingLeft: "0px" }}
+                        >
+                          <span style={{ fontSize: "13px", fontWeight: 600 }}>
+                            {job.companyName}
+                          </span>
+                          <br />
+                          <span style={{ fontSize: "18px", fontWeight: "700" }}>
+                            {job.position}
+                          </span>
+                          <br />
+                          <span style={{ fontSize: "13px", fontWeight: 500 }}>
+                            {job.jobType} |{" "}
+                            {job.candidateRegion || "Anywhere in the world"}{" "}
+                          </span>
+                        </GridItem>
+                        <GridItem xs={2} sm={2} md={2}>
+                          <span style={{ fontSize: "16px", fontWeight: 600 }}>
+                            {moment(job.createdAt).format("MMM") +
+                              " " +
+                              moment(job.createdAt).format("DD") || "Oct 13"}
+                          </span>
+                        </GridItem>
+                      </GridContainer>
+                    </CardBody>
+                  </Card>
+                </RouterLink>
+              ))}
+            </>
+          ))}
+          {/* <Card>
             <CardBody>
               <GridContainer
                 justify="start"
@@ -192,10 +286,10 @@ export default function JobsSection(props) {
                 </GridItem>
               </GridContainer>
             </CardBody>
-          </Card>
+          </Card> */}
 
           {/* Customer Service */}
-          <h3 className={classes.title + " align-left"}>
+          {/* <h3 className={classes.title + " align-left"}>
             Customer Service
             <span style={{ float: "right" }}>
               <Button
@@ -335,7 +429,7 @@ export default function JobsSection(props) {
                 </GridItem>
               </GridContainer>
             </CardBody>
-          </Card>
+          </Card> */}
         </GridItem>
       </GridContainer>
     </div>

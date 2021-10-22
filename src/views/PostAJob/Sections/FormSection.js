@@ -41,6 +41,11 @@ import { useMutation } from "react-query";
 import { useAuth } from "components/AuthProvider/AuthProvider";
 import axios from "axios";
 import { useSnackbar } from "notistack";
+import MUIEditor, { MUIEditorState, toHTML } from "react-mui-draft-wysiwyg";
+import { toolbarControlTypes } from "react-mui-draft-wysiwyg";
+import { convertFromHTML, convertToRaw } from "draft-js";
+import { stateToHTML } from "draft-js-export-html";
+import { ContentState } from "draft-js";
 
 const useStyles = makeStyles(styles);
 const useSelectStyles = makeStyles(customSelectStyle);
@@ -55,11 +60,17 @@ const validationSchema = yup.object({
     .required("Position is required"),
   category: yup.string().required("Category is required"),
   jobType: yup.string().required("Job Type is required"),
-  jobDescription: yup
-    .string()
-    .trim()
-    .min(50, "Must be atleast 50 characters long")
-    .required("Job Description is required"),
+  // jobDescriptionState: yup
+  //   .object()
+  //   // .test("has text", "Cannot save an empty note", (value) =>
+  //   //   value.getCurrentContent().hasText()
+  //   // )
+  //   .required("Job Description is required."),
+  // jobDescription: yup
+  //   .string()
+  //   .trim()
+  //   .min(50, "Must be atleast 50 characters long")
+  //   .required("Job Description is required"),
   applyType: yup.string().required("Choose a option"),
   applyValue: yup
     .string()
@@ -114,6 +125,47 @@ const validationSchema = yup.object({
 });
 
 export default function FormSection(props) {
+  const [editorStateJob, setEditorStateJob] = React.useState(
+    MUIEditorState.createEmpty()
+  );
+
+  const onChangeJob = (newState) => {
+    setEditorStateJob(newState);
+  };
+  const [editorStateCompany, setEditorStateCompany] = React.useState(
+    MUIEditorState.createEmpty()
+  );
+
+  const onChangeCompany = (newState) => {
+    setEditorStateCompany(newState);
+  };
+  const config = {
+    editor: {
+      style: {
+        fontFamily: "Roboto Slab",
+        fontSize: "14px",
+      },
+    },
+    toolbar: {
+      style: {
+        padding: 0,
+        color: "#00acc1",
+      },
+      controls: [
+        toolbarControlTypes.undo,
+        toolbarControlTypes.redo,
+        toolbarControlTypes.bold,
+        toolbarControlTypes.italic,
+        toolbarControlTypes.underline,
+        toolbarControlTypes.strikethrough,
+        toolbarControlTypes.linkAdd,
+        toolbarControlTypes.linkRemove,
+        toolbarControlTypes.textAlign,
+        toolbarControlTypes.orderedList,
+        toolbarControlTypes.unorderedList,
+      ],
+    },
+  };
   const { enqueueSnackbar } = useSnackbar();
   const { state } = useAuth();
   const mutation = useMutation(
@@ -145,6 +197,14 @@ export default function FormSection(props) {
       },
     }
   );
+  const sampleMarkup =
+    '<p><strong>Our Stack (we don&#x27;t expect you to have all of these)</strong><br/><br/><br/>Vue + Vuex + Vue Router + Webpack + Less + SCSS<br/>Element UI<br/>FreeMarker<br/>AWS, Circle, Drone CI, K8s<br/><br/><br/><strong>Responsibilities</strong><br/><br/><br/>Develop mobile-first frontends in VueJS<br/><br/><br/>Focus on performance and user experience<br/><br/><br/>Create frontends for the backend management systems<br/><br/><br/>Participate in code reviews with peers and managers to ensure that each increment adheres to original vision as described in the user story and all standard resource libraries and architecture patterns as appropriate<br/><br/><br/>Participate in team ceremonies including planning, grooming, product demonstrations, and team retrospectives<br/><br/><br/>Mentoring less experienced team members<br/><br/><br/><strong>Requirements</strong><br/><br/><br/>Familiarity with at least one: Vue, React, Angular<br/><br/><br/>Familiarity with Git, ES6, Webpack, Less or Sass, and NodeJS<br/><br/><br/>Familiarity with state management like Vuex, Redux, Ngrx<br/><br/><br/>Excellent communication skills <br/><br/><br/>Knowledge of backend stack is a plus<br/><br/><br/>Based in Europe</p><p><strong>Benefits</strong><br/><br/><br/>Quarterly and flash bonuses<br/>Flexible working hours<br/>Top-of-the-line equipment<br/>Education allowance<br/>Referral bonuses<br/>Annual company holidays - we’re hoping to make it to Dubai this year<br/>Highly talented, dependable co-workers in a global, multicultural organisation<br/>We score 100% on The Joel Test<br/>Our EU team is small enough for you to be impactful<br/>Our business is globally established and successful, offering stability and security to our Team Members</p><a href="http://www.facebook.com">Example link</a>';
+
+  const blocksFromHTML = convertFromHTML(sampleMarkup);
+  const jstate = ContentState.createFromBlockArray(
+    blocksFromHTML.contentBlocks,
+    blocksFromHTML.entityMap
+  );
   const planPrice = { "1 Month": 199, "2 Month": 299, "3 Month": 399 };
   const formik = useFormik({
     initialValues: {
@@ -156,12 +216,14 @@ export default function FormSection(props) {
       applyType: "",
       applyValue: "",
       jobDescription: "",
+      jobDescriptionState: null,
       companyName: "",
       companyLogo: "",
       logoFile: null,
       companyWebsite: "",
       companyTagLine: "",
       companyDescription: "",
+      companyDescriptionState: null,
       planType: "",
     },
     validationSchema: validationSchema,
@@ -174,6 +236,20 @@ export default function FormSection(props) {
       reader.readAsDataURL(file);
       reader.onloadend = () => {
         values.companyLogo = reader.result;
+
+        values.jobDescription = stateToHTML(editorStateJob.getCurrentContent());
+        values.jobDescriptionState = convertToRaw(
+          editorStateJob.getCurrentContent()
+        );
+
+        values.companyDescription = stateToHTML(
+          editorStateCompany.getCurrentContent()
+        );
+        values.companyDescriptionState = convertToRaw(
+          editorStateCompany.getCurrentContent()
+        );
+        // values.companyDescriptionState = "";
+        // values.jobDescriptionState = "";
         // this.setState({
         //   file: file,
         //   base64: reader.result,
@@ -181,6 +257,8 @@ export default function FormSection(props) {
         // alert(JSON.stringify(values, null, 2)); // POST REQUEST
         mutation.mutate(JSON.stringify(values, null, 2));
         resetForm();
+        setEditorStateJob(MUIEditorState.createEmpty());
+        setEditorStateCompany(MUIEditorState.createEmpty());
       };
     },
   });
@@ -701,7 +779,7 @@ export default function FormSection(props) {
               <GridItem xs={10} sm={10} md={10}>
                 <h3
                   style={{
-                    marginBottom: "-27px",
+                    marginBottom: "9px",
                     marginTop: "25px",
                     fontSize: "1.27rem",
                     paddingTop: "0px",
@@ -710,7 +788,16 @@ export default function FormSection(props) {
                 >
                   Job Description <span style={{ color: "red" }}>*</span>
                 </h3>
-                <CustomInput
+                <MUIEditor
+                  editorState={editorStateJob}
+                  onChange={onChangeJob}
+                  // onChange={(newState) => {
+                  //   formik.setFieldValue("jobDescriptionState", newState);
+                  // }}
+                  // onBlur={formik.handleBlur}
+                  config={config}
+                />
+                {/* <CustomInput
                   // labelText="Your Message"
                   id="message"
                   formControlProps={{
@@ -728,7 +815,7 @@ export default function FormSection(props) {
                       formik.touched.jobDescription &&
                       Boolean(formik.errors.jobDescription),
                   }}
-                />
+                /> */}
                 <p
                   style={{
                     marginTop: "-9px",
@@ -1037,7 +1124,7 @@ export default function FormSection(props) {
               <GridItem xs={10} sm={10} md={10}>
                 <h3
                   style={{
-                    marginBottom: "-27px",
+                    marginBottom: "9px",
                     marginTop: "25px",
                     fontSize: "1.27rem",
                     paddingTop: "0px",
@@ -1046,7 +1133,7 @@ export default function FormSection(props) {
                 >
                   Tell us more about your Company
                 </h3>
-                <CustomInput
+                {/* <CustomInput
                   id="message"
                   formControlProps={{
                     fullWidth: true,
@@ -1059,6 +1146,15 @@ export default function FormSection(props) {
                     onChange: formik.handleChange,
                     onBlur: formik.handleBlur,
                   }}
+                /> */}
+                <MUIEditor
+                  editorState={editorStateCompany}
+                  onChange={onChangeCompany}
+                  // onChange={(newState) => {
+                  //   formik.setFieldValue("companyDescriptionState", newState);
+                  // }}
+                  // onBlur={formik.handleBlur}
+                  config={config}
                 />
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
