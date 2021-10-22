@@ -15,7 +15,7 @@ const lockJS = new Auth0Lock(
     auth: {
       redirect: false,
       responseType: "token id_token",
-      redirectUrl: "http://localhost:3000/",
+      // redirectUrl: "http://localhost:3000/",
       sso: false,
       autoParseHash: true,
       audience: process.env.REACT_APP_AUTH0_AUDIENCE_JS,
