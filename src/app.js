@@ -71,7 +71,7 @@ export default function App(props) {
             <Switch>
               <Route path="/post-a-job" component={PostAJob} />
               <Route path="/dashboard" component={Dashboard} />
-              <Route path="/applicants" component={Applicants} />
+              {/* <Route path="/applicants" component={Applicants} /> */}
               <Route path="/jobs" component={Jobs} />
               <Route path="/job/:jobId" component={JobDetails} />
               <Route path="/apply/:jobId" component={JobApply} />
