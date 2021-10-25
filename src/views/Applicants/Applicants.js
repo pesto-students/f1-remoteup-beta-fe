@@ -15,6 +15,7 @@ import Person from "@material-ui/icons/Person";
 import Edit from "@material-ui/icons/Edit";
 import Close from "@material-ui/icons/Close";
 import Done from "@material-ui/icons/Done";
+import AttachFile from "@mui/icons-material/AttachFile";
 
 // @material-ui/core
 import Snackbar from "@mui/material/Snackbar";
@@ -41,6 +42,38 @@ import ProductSection from "../LandingPage/Sections/ProductSection.js";
 import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useQuery, useQueries } from "react-query";
+import moment from "moment";
+
+function openBase64NewTab(base64Pdf) {
+  var blob = base64toBlob(base64Pdf);
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(blob, "pdfBase64.pdf");
+  } else {
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl);
+  }
+}
+
+function base64toBlob(base64Data) {
+  const sliceSize = 1024;
+  const byteCharacters = atob(base64Data);
+  const bytesLength = byteCharacters.length;
+  const slicesCount = Math.ceil(bytesLength / sliceSize);
+  const byteArrays = new Array(slicesCount);
+
+  for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+    const begin = sliceIndex * sliceSize;
+    const end = Math.min(begin + sliceSize, bytesLength);
+
+    const bytes = new Array(end - begin);
+    for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
+      bytes[i] = byteCharacters[offset].charCodeAt(0);
+    }
+    byteArrays[sliceIndex] = new Uint8Array(bytes);
+  }
+  return new Blob(byteArrays, { type: "application/pdf" });
+}
 
 const dashboardRoutes = [];
 
@@ -127,10 +160,38 @@ function Status(props) {
 }
 
 export default function Applicants(props) {
+  const jobId = props.match.params.jobId;
   const classes = useStyles();
   const tableClasses = useTableStyles();
   const { state } = useAuth();
   const { ...rest } = props;
+
+  const queries = useQueries([
+    {
+      queryKey: `job-${jobId}`,
+      queryFn: () => {
+        return fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then(
+          (res) => res.json()
+        );
+      },
+    },
+    {
+      queryKey: `applicants-${jobId}`,
+      queryFn: () => {
+        return fetch(
+          `http://127.0.0.1:8000/recruiter/applicants/viewapplications/${jobId}`,
+          {
+            headers: new Headers({
+              Authorization: `Bearer ${state.accessToken}`,
+            }),
+          }
+        ).then((res) => res.json());
+      },
+    },
+  ]);
+  const [job, app] = queries;
+  // const app = queries[1];
+
   const fillButtons = [
     // { color: "info", icon: Person },
     { color: "info", icon: Edit },
@@ -151,6 +212,48 @@ export default function Applicants(props) {
       </>
     );
   });
+
+  if (job.isLoading) {
+    return "...isLoading";
+  }
+
+  if (job.error) {
+    return "An error occured " + error.message;
+  }
+
+  if (app.isLoading) {
+    return "...isAppLoading";
+  }
+
+  if (app.error) {
+    return "An error occured " + appError.message;
+  }
+  const apps = [];
+
+  app.data.payload.applications.map((app, index) =>
+    apps.push([
+      index + 1,
+      app.fullName,
+      app.email,
+      app.phone,
+      app.exp,
+      moment(app.createdAt).format("MMM") +
+        " " +
+        moment(app.createdAt).format("DD"),
+      <Button
+        style={{ marginLeft: "10px" }}
+        justIcon
+        round
+        size="sm"
+        color="info"
+        onClick={() => openBase64NewTab(app.resume.split(",")[1])}
+      >
+        <AttachFile />
+      </Button>,
+      <Status status={app.applicationStatus} />,
+    ])
+  );
+
   return state.isAuthenticated && state.role === "Recruiter" ? (
     <div>
       <Header
@@ -196,32 +299,36 @@ export default function Applicants(props) {
                 }}
                 className="roboto-slab"
               >
-                Senior React Engineer
+                {job.data.payload.jobData.position}
               </h3>
               <h5 className="roboto-slab">
                 <Category style={{ verticalAlign: "middle" }} />
                 <span style={{ verticalAlign: "middle" }}>
                   {" "}
-                  Software Development &nbsp;&nbsp;{" "}
+                  {job.data.payload.jobData.category} &nbsp;&nbsp;{" "}
                 </span>
                 <Schedule style={{ verticalAlign: "middle" }} />
-                <span style={{ verticalAlign: "middle" }}> Full-Time</span>
+                <span style={{ verticalAlign: "middle" }}>
+                  {" "}
+                  {job.data.payload.jobData.jobType}
+                </span>
               </h5>
               <h5 className="roboto-slab">
                 <World style={{ verticalAlign: "middle" }} />
                 <span style={{ verticalAlign: "middle" }}>
                   {" "}
-                  Anywhere in the world
+                  {job.data.payload.jobData.candidateRegion ||
+                    "Anywhere in the world"}
                 </span>
               </h5>
             </GridItem>
             <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
-            <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
+            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
             <GridItem
-              xs={8}
-              sm={8}
-              md={8}
-              lg={8}
+              xs={10}
+              sm={10}
+              md={10}
+              lg={10}
               style={{ marginTop: "18px", textAlign: "left" }}
             >
               <h3
@@ -235,9 +342,9 @@ export default function Applicants(props) {
                 Applicants
               </h3>
             </GridItem>
-            <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
-            <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
-            <GridItem xs={8} sm={8} md={8} lg={8}>
+            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
+            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
+            <GridItem xs={10} sm={10} md={10} lg={10}>
               <Table
                 tableHead={[
                   "#",
@@ -245,53 +352,36 @@ export default function Applicants(props) {
                   "Email",
                   "Phone",
                   "Exp.(Yrs.)",
+                  "Submitted",
+                  "Resume",
                   "Status",
                 ]}
-                tableData={[
-                  [
-                    "1",
-                    "Andrew Mike",
-                    "andrew@gmail.com",
-                    "+1122199021910",
-                    "5",
-                    <Status status="Submitted" />,
-                  ],
-                  [
-                    "2",
-                    "John Doe",
-                    "john@gmail.com",
-                    "+912768731267",
-                    "3",
-                    <Status status="Submitted" />,
-                  ],
-                  [
-                    "3",
-                    "Alex Mike",
-                    "alex@gmail.com",
-                    "+128301239023",
-                    "2",
-                    <Status status="Submitted" />,
-                  ],
-                ]}
+                tableData={apps}
                 customCellClasses={[
                   tableClasses.textCenter,
                   tableClasses.textCenter,
                   tableClasses.textCenter,
                   tableClasses.textCenter,
                   tableClasses.textCenter,
+                  tableClasses.textCenter,
+                  tableClasses.textCenter,
+                  tableClasses.textCenter,
                 ]}
-                customClassesForCells={[0, 1, 2, 3, 4]}
+                customClassesForCells={[0, 1, 2, 3, 4, 5, 6, 7]}
                 customHeadCellClasses={[
                   tableClasses.textCenter,
                   tableClasses.textCenter,
                   tableClasses.textCenter,
                   tableClasses.textCenter,
                   tableClasses.textCenter,
+                  tableClasses.textCenter,
+                  tableClasses.textCenter,
+                  tableClasses.textCenter,
                 ]}
-                customHeadClassesForCells={[0, 1, 2, 3, 4]}
+                customHeadClassesForCells={[0, 1, 2, 3, 4, 5, 6, 7]}
               />
             </GridItem>
-            <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
+            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
           </GridContainer>
         </div>
       </div>
