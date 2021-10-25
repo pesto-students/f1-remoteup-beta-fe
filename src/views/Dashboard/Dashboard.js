@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // @material-ui/core components
@@ -36,17 +36,60 @@ import ProductSection from "../LandingPage/Sections/ProductSection.js";
 import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useQuery } from "react-query";
+import moment from "moment";
 
 const dashboardRoutes = [];
 
 const useStyles = makeStyles(styles);
 const useTableStyles = makeStyles(tableStyle);
 
+function Actions(props) {
+  return (
+    <>
+      <Button
+        component={Link}
+        to={`/applicants/${props.id}`}
+        justIcon
+        size="sm"
+        color="info"
+      >
+        <Person />
+      </Button>
+      <Button justIcon size="sm" color="success">
+        <Edit />
+      </Button>
+      <Button justIcon size="sm" color="danger">
+        <Close />
+      </Button>
+    </>
+  );
+}
+
 export default function Dashboard(props) {
   const classes = useStyles();
   const tableClasses = useTableStyles();
   const { state } = useAuth();
   const { ...rest } = props;
+
+  const { isLoading, error, data } = useQuery("dashboard", () =>
+    fetch("http://127.0.0.1:8000/recruiter/job/viewjobs", {
+      headers: new Headers({
+        Authorization: `Bearer ${state.accessToken}`,
+      }),
+    }).then((res) => res.json())
+  );
+
+  if (isLoading) {
+    return "...isLoading";
+  }
+
+  if (error) {
+    return "An error occured " + error.message;
+  }
+
+  const jobs = [];
+
   const fillButtons = [
     { color: "info", icon: Person },
     { color: "success", icon: Edit },
@@ -58,6 +101,21 @@ export default function Dashboard(props) {
       </Button>
     );
   });
+
+  data.payload.jobData.map((job, index) =>
+    jobs.push([
+      index + 1,
+      job.position,
+      job.category,
+      job.jobType,
+      moment(job.createdAt).format("MMM") +
+        " " +
+        moment(job.createdAt).format("DD"),
+      job.planType,
+      <Actions id={job._id} />,
+    ])
+  );
+
   return state.isAuthenticated && state.role === "Recruiter" ? (
     <div>
       <Header
@@ -102,7 +160,7 @@ export default function Dashboard(props) {
                 }}
                 className="roboto-slab"
               >
-                5
+                {data.payload.totalActiveJobs}
               </h2>
               <h3
                 style={{
@@ -228,35 +286,7 @@ export default function Dashboard(props) {
                   "Plan Type",
                   "Actions",
                 ]}
-                tableData={[
-                  [
-                    "1",
-                    "React Engineer",
-                    "Software Development",
-                    "Full-Time",
-                    "Oct 16, 2021",
-                    "1 Month",
-                    fillButtons,
-                  ],
-                  [
-                    "2",
-                    "Senior Software Engineer",
-                    "Software Development",
-                    "Full-Time",
-                    "Oct 15, 2021",
-                    "2 Month",
-                    fillButtons,
-                  ],
-                  [
-                    "3",
-                    "Marketing Manager",
-                    "Marketing",
-                    "Full-Time",
-                    "Oct 14, 2021",
-                    "3 Month",
-                    fillButtons,
-                  ],
-                ]}
+                tableData={jobs}
                 tableHeaderColor="warning"
                 hover
                 customCellClasses={[tableClasses.textCenter]}
