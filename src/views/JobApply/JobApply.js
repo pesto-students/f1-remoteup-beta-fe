@@ -60,6 +60,9 @@ import * as yup from "yup";
 
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
 
+import { useQuery, useMutation } from "react-query";
+import { useSnackbar } from "notistack";
+
 const dashboardRoutes = [];
 
 const cardStyles = {
@@ -86,7 +89,7 @@ const validationSchema = yup.object({
     .trim()
     .email("Enter a valid email address")
     .required("Email is required"),
-  phoneNumber: yup
+  phone: yup
     .string()
     .matches(phoneRegExp, "Enter a valid Phone Number")
     .required("Phone is required"),
@@ -103,24 +106,71 @@ const validationSchema = yup.object({
       "Supported format: pdf only",
       (value) => !value || (value && SUPPORTED_FORMATS.includes(value.type))
     ),
+  exp: yup
+    .number("Input Number of Years")
+    .typeError("Enter a positive number")
+    .positive("Experience cannot be negative")
+    .required("Work Experience is required"),
 });
 
+function ScrollToTopOnMount() {
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  return null;
+}
+
 export default function JobApply(props) {
+  const jobId = props.match.params.jobId;
+  console.log(jobId);
   const classes = useStyles();
   const cardClasses = useCardStyles();
   const typoClasses = useTypoStyles();
   const workClasses = useWorkStyles();
   const { state } = useAuth();
   const { ...rest } = props;
+  const { enqueueSnackbar } = useSnackbar();
+  const mutation = useMutation(
+    (newApp) =>
+      // axios.post(
+      //   "http://127.0.0.1:8000/recruiter/job/postjob",
+      //   {
+      //     Authorization: `Bearer ${state.accessToken}`,
+      //     "Content-Type": "application/json",
+      //   },
+      //   newJob
+      // ),
+      {
+        return fetch(`http://127.0.0.1:8000/jobseeker/job/applyjob/${jobId}`, {
+          method: "PATCH",
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+            "Content-Type": "application/json",
+          }),
+          body: newApp,
+        });
+      },
+    {
+      onSuccess: () => {
+        // Success notification
+        enqueueSnackbar("Application submitted successfully!", {
+          variant: "success",
+        });
+      },
+    }
+  );
+
   const formik = useFormik({
     initialValues: {
       fullName: "",
       email: "",
-      phoneNumber: "",
+      phone: "",
       resume: null,
+      exp: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       values["resumeName"] = values.resume.name;
       values["resumeType"] = values.resume.type;
       values["resumeSize"] = values.resume.size;
@@ -128,16 +178,33 @@ export default function JobApply(props) {
       let reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onloadend = () => {
-        values["base64"] = reader.result;
+        values.resume = reader.result;
         // this.setState({
         //   file: file,
         //   base64: reader.result,
         // });
-        alert(JSON.stringify(values, null, 2)); // POST REQUEST
+        // alert(JSON.stringify(values, null, 2)); // POST REQUEST
+        mutation.mutate(JSON.stringify(values, null, 2));
+        resetForm();
       };
     },
   });
-  console.log(state.isAuthenticated);
+
+  const { isLoading, error, data } = useQuery(`apply-${jobId}`, () =>
+    fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
+      res.json()
+    )
+  );
+
+  if (isLoading) {
+    console.log("Job Apply isLoading");
+    return "...isLoading";
+  }
+
+  if (error) {
+    return "An error occured " + error.message;
+  }
+
   return state.isAuthenticated && state.role === "Jobseeker" ? (
     <div>
       <Header
@@ -152,6 +219,7 @@ export default function JobApply(props) {
         // }}
         {...rest}
       />
+      <ScrollToTopOnMount />
       <div className={classNames(classes.mainDiv)}>
         <div className={classes.container} style={{ minHeight: "900px" }}>
           {/* <ProductSection />
@@ -177,7 +245,7 @@ export default function JobApply(props) {
               >
                 <img
                   style={{ height: "90px", width: "90px" }}
-                  src={podsights}
+                  src={data.payload.jobData.companyLogo}
                   alt="..."
                   className={
                     typoClasses.imgRaised +
@@ -195,7 +263,7 @@ export default function JobApply(props) {
                   }}
                   className="roboto-slab"
                 >
-                  Podsights
+                  {data.payload.jobData.companyName}
                 </span>
               </GridItem>
               <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
@@ -216,22 +284,26 @@ export default function JobApply(props) {
                   }}
                   className="roboto-slab"
                 >
-                  Senior React Engineer
+                  {data.payload.jobData.position}
                 </h3>
                 <h5 className="roboto-slab">
                   <Category style={{ verticalAlign: "middle" }} />
                   <span style={{ verticalAlign: "middle" }}>
                     {" "}
-                    Software Development &nbsp;&nbsp;{" "}
+                    {data.payload.jobData.category} &nbsp;&nbsp;{" "}
                   </span>
                   <Schedule style={{ verticalAlign: "middle" }} />
-                  <span style={{ verticalAlign: "middle" }}> Full-Time</span>
+                  <span style={{ verticalAlign: "middle" }}>
+                    {" "}
+                    {data.payload.jobData.jobType}
+                  </span>
                 </h5>
                 <h5 className="roboto-slab">
                   <World style={{ verticalAlign: "middle" }} />
                   <span style={{ verticalAlign: "middle" }}>
                     {" "}
-                    Anywhere in the world
+                    {data.payload.jobData.candidateRegion ||
+                      "Anywhere in the world"}
                   </span>
                 </h5>
               </GridItem>
@@ -357,30 +429,25 @@ export default function JobApply(props) {
 
                 <CustomInput
                   inputProps={{
-                    id: "phoneNumber",
-                    name: "phoneNumber",
+                    id: "phone",
+                    name: "phone",
                     onChange: formik.handleChange,
                     onBlur: formik.handleBlur,
                     placeholder: "with country code",
-                    value: formik.values.phoneNumber,
-                    error:
-                      formik.touched.phoneNumber &&
-                      Boolean(formik.errors.phoneNumber),
+                    value: formik.values.phone,
+                    error: formik.touched.phone && Boolean(formik.errors.phone),
                   }}
                   style={{ marginTop: "0px" }}
-                  id="phoneNumber"
+                  id="phone"
                   formControlProps={{
                     fullWidth: true,
                   }}
                 />
                 <FormHelperText
                   style={{ marginTop: "-14px" }}
-                  error={
-                    formik.touched.phoneNumber &&
-                    Boolean(formik.errors.phoneNumber)
-                  }
+                  error={formik.touched.phone && Boolean(formik.errors.phone)}
                 >
-                  {formik.touched.phoneNumber && formik.errors.phoneNumber}
+                  {formik.touched.phone && formik.errors.phone}
                 </FormHelperText>
               </GridItem>
               <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
@@ -413,7 +480,9 @@ export default function JobApply(props) {
                     placeholder: "Format: pdf only, Size: Max 1 MB",
                     name: "resume",
                     onBlur: formik.handleBlur,
-                    // value: formik.values.companyLogo,
+                    value: formik.values.resume
+                      ? formik.values.resume.name
+                      : "",
                     error:
                       formik.touched.resume && Boolean(formik.errors.resume),
                   }}
@@ -434,6 +503,46 @@ export default function JobApply(props) {
                   error={formik.touched.resume && Boolean(formik.errors.resume)}
                 >
                   {formik.touched.resume && formik.errors.resume}
+                </FormHelperText>
+              </GridItem>
+              <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
+
+              {/* Work Experience */}
+              <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
+              <GridItem xs={6} sm={6} md={6} lg={6}>
+                <h3
+                  style={{
+                    marginBottom: "-27px",
+                    fontSize: "1.18rem",
+                    marginTop: "0px",
+                    paddingTop: "30px",
+                  }}
+                  className={workClasses.title + " align-left"}
+                >
+                  Work Experience <span style={{ color: "red" }}>*</span>
+                </h3>
+
+                <CustomInput
+                  inputProps={{
+                    id: "exp",
+                    name: "exp",
+                    onChange: formik.handleChange,
+                    onBlur: formik.handleBlur,
+                    placeholder: "number of years e.g. 4.5",
+                    value: formik.values.exp,
+                    error: formik.touched.exp && Boolean(formik.errors.exp),
+                  }}
+                  style={{ marginTop: "0px" }}
+                  id="fullName"
+                  formControlProps={{
+                    fullWidth: true,
+                  }}
+                />
+                <FormHelperText
+                  style={{ marginTop: "-14px" }}
+                  error={formik.touched.exp && Boolean(formik.errors.exp)}
+                >
+                  {formik.touched.exp && formik.errors.exp}
                 </FormHelperText>
               </GridItem>
               <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
