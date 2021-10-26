@@ -54,7 +54,8 @@ import WorkSection from "../LandingPage/Sections/WorkSection.js";
 
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
 import { lockJS } from "components/AuthProvider/lockJS";
-import { useQuery } from "react-query";
+import { useQuery, useQueries, useMutation } from "react-query";
+import { useSnackbar } from "notistack";
 
 const dashboardRoutes = [];
 
@@ -77,27 +78,113 @@ const useTypoStyles = makeStyles(typoStyles);
 
 export default function JobDetails(props) {
   const jobId = props.match.params.jobId;
+  const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles();
   const cardClasses = useCardStyles();
   const typoClasses = useTypoStyles();
 
   const { state } = useAuth();
   const { ...rest } = props;
+  const [isApplied, setIsApplied] = React.useState(false);
+  const [isSaved, setIsSaved] = React.useState(false);
+
   console.log(state.isAuthenticated);
 
-  const { isLoading, error, data } = useQuery(`job-${jobId}`, () =>
-    fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
-      res.json()
-    )
-  );
+  const queries = useQueries([
+    {
+      queryKey: `job-${jobId}`,
+      queryFn: () => {
+        return fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then(
+          (res) => res.json()
+        );
+      },
+    },
+    {
+      queryKey: `savedjobs`,
+      queryFn: () => {
+        return fetch(`http://127.0.0.1:8000/jobseeker/job/viewsavedjobs`, {
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+          }),
+        }).then((res) => res.json());
+      },
+    },
+    {
+      queryKey: `appliedjobs`,
+      queryFn: () => {
+        return fetch(`http://127.0.0.1:8000/jobseeker/job/viewappliedjobs`, {
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+          }),
+        }).then((res) => res.json());
+      },
+    },
+  ]);
+  const [job, saved, applied] = queries;
 
-  if (isLoading) {
+  React.useEffect(() => {
+    if (state.isAuthenticated && applied.data) {
+      const allApplied = [];
+      applied.data.payload.jobData.map((job) => {
+        allApplied.push(job._id);
+      });
+      if (allApplied.includes(jobId)) {
+        setIsApplied(true);
+      }
+    }
+    if (state.isAuthenticated && saved.data) {
+      const allSaved = [];
+      saved.data.payload.jobData.map((job) => allSaved.push(job._id));
+      if (allSaved.includes(jobId)) {
+        setIsSaved(true);
+      }
+    }
+  });
+
+  const mutation = useMutation(() => {
+    return fetch(`http://127.0.0.1:8000/jobseeker/job/saveunsavejob/${jobId}`, {
+      method: "PATCH",
+      headers: new Headers({
+        Authorization: `Bearer ${state.accessToken}`,
+        "Content-Type": "application/json",
+      }),
+    });
+  });
+
+  function processSave() {
+    if (isSaved) {
+      setIsSaved(false);
+      enqueueSnackbar("Job Unsaved", {
+        variant: "success",
+      });
+    } else {
+      setIsSaved(true);
+      enqueueSnackbar("Job Saved", {
+        variant: "success",
+      });
+    }
+    mutation.mutate();
+  }
+
+  React.useEffect(() => {
+    console.log("Updated");
+  }, [isApplied, isSaved]);
+
+  // const { isLoading, error, data } = useQuery(`job-${jobId}`, () =>
+  //   fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
+  //     res.json()
+  //   )
+  // );
+
+  if (job.isLoading) {
     return "...isLoading";
   }
 
-  if (error) {
+  if (job.error) {
     return "An error occured " + error.message;
   }
+
+  const data = job.data;
 
   return (
     <div>
@@ -249,19 +336,40 @@ export default function JobDetails(props) {
               )}
               {state.role === "Jobseeker" && (
                 <>
-                  <Button fullWidth color="info">
-                    <BookmarkBorder />
-                    <span className="right-link">Save</span>
+                  <Button onClick={() => processSave()} fullWidth color="info">
+                    {isSaved ? (
+                      <>
+                        <Done />
+                        <span className="right-link">Saved</span>
+                      </>
+                    ) : (
+                      <>
+                        <BookmarkBorder />
+                        <span className="right-link">Save</span>
+                      </>
+                    )}
                   </Button>
-                  <Button
-                    component={Link}
-                    to={`/apply/${jobId}`}
-                    fullWidth
-                    color="facebook"
-                  >
-                    <MailOutline />
-                    <span className="right-link">Apply</span>
-                  </Button>
+                  {isApplied ? (
+                    <Button
+                      // component={Link}
+                      // to={`/apply/${jobId}`}
+                      fullWidth
+                      color="facebook"
+                    >
+                      <Done />
+                      <span className="right-link">Applied</span>
+                    </Button>
+                  ) : (
+                    <Button
+                      component={Link}
+                      to={`/apply/${jobId}`}
+                      fullWidth
+                      color="facebook"
+                    >
+                      <MailOutline />
+                      <span className="right-link">Apply</span>
+                    </Button>
+                  )}
                 </>
               )}
             </GridItem>
@@ -422,9 +530,18 @@ export default function JobDetails(props) {
                 </Button>
               )}
               {state.role === "Jobseeker" && (
-                <Button fullWidth color="info">
-                  <BookmarkBorder />
-                  <span className="right-link">Save</span>
+                <Button onClick={() => processSave()} fullWidth color="info">
+                  {isSaved ? (
+                    <>
+                      <Done />
+                      <span className="right-link">Saved</span>
+                    </>
+                  ) : (
+                    <>
+                      <BookmarkBorder />
+                      <span className="right-link">Save</span>
+                    </>
+                  )}
                 </Button>
               )}
             </GridItem>
@@ -440,15 +557,29 @@ export default function JobDetails(props) {
                 </Button>
               )}
               {state.role === "Jobseeker" && (
-                <Button
-                  component={Link}
-                  to={`/apply/${jobId}`}
-                  fullWidth
-                  color="facebook"
-                >
-                  <MailOutline />
-                  <span className="right-link">Apply</span>
-                </Button>
+                <>
+                  {isApplied ? (
+                    <Button
+                      // component={Link}
+                      // to={`/apply/${jobId}`}
+                      fullWidth
+                      color="facebook"
+                    >
+                      <Done />
+                      <span className="right-link">Applied</span>
+                    </Button>
+                  ) : (
+                    <Button
+                      component={Link}
+                      to={`/apply/${jobId}`}
+                      fullWidth
+                      color="facebook"
+                    >
+                      <MailOutline />
+                      <span className="right-link">Apply</span>
+                    </Button>
+                  )}
+                </>
               )}
             </GridItem>
             <GridItem xs={4} sm={4} md={4} lg={4}></GridItem>
