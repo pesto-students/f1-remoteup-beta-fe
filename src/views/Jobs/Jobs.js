@@ -1,5 +1,6 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link as RouterLink } from "react-router-dom";
+
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // @material-ui/core components
@@ -43,6 +44,8 @@ import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useQueries } from "react-query";
+import moment from "moment";
 
 const dashboardRoutes = [];
 
@@ -62,6 +65,38 @@ export default function Jobs(props) {
   const { state } = useAuth();
   const { ...rest } = props;
   console.log(state.isAuthenticated);
+  const queries = useQueries([
+    {
+      queryKey: `savedjobs`,
+      queryFn: () => {
+        return fetch(`http://127.0.0.1:8000/jobseeker/job/viewsavedjobs`, {
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+          }),
+        }).then((res) => res.json());
+      },
+    },
+    {
+      queryKey: `appliedjobs`,
+      queryFn: () => {
+        return fetch(`http://127.0.0.1:8000/jobseeker/job/viewappliedjobs`, {
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+          }),
+        }).then((res) => res.json());
+      },
+    },
+  ]);
+  const [saved, applied] = queries;
+
+  if (saved.isLoading || applied.isLoading) {
+    return "...isLoading";
+  }
+
+  if (saved.error || applied.error) {
+    return "An error occured " + error.message;
+  }
+
   return state.isAuthenticated && state.role === "Jobseeker" ? (
     <div>
       <Header
@@ -94,150 +129,164 @@ export default function Jobs(props) {
                   {
                     tabButton: "Saved Jobs",
                     tabIcon: BookmarkBorder,
-                    tabContent: (
-                      <Card>
-                        <CardBody>
-                          <GridContainer
-                            justify="start"
-                            alignItems="center"
-                            className="roboto-slab"
-                            style={{ color: "#3c4858" }}
-                          >
-                            <GridItem
-                              xs={2}
-                              sm={2}
-                              md={2}
-                              style={{ paddingLeft: "0px" }}
+                    tabContent: saved.data.payload.jobData.map((job) => (
+                      <RouterLink to={`/job/${job._id}`} key={job._id}>
+                        <Card>
+                          <CardBody>
+                            <GridContainer
+                              justify="start"
+                              alignItems="center"
+                              className="roboto-slab"
+                              style={{ color: "#3c4858" }}
                             >
-                              <img
-                                src={image}
-                                alt="..."
-                                className={
-                                  typoClasses.imgRaised +
-                                  " " +
-                                  typoClasses.imgRoundedCircle +
-                                  " " +
-                                  typoClasses.imgFluid
-                                }
-                              />
-                            </GridItem>
-                            <GridItem
-                              xs={8}
-                              sm={8}
-                              md={8}
-                              style={{ paddingLeft: "0px" }}
-                            >
-                              <span
-                                style={{ fontSize: "13px", fontWeight: 600 }}
+                              <GridItem
+                                xs={2}
+                                sm={2}
+                                md={2}
+                                style={{ paddingLeft: "0px" }}
                               >
-                                Podsights
-                              </span>
-                              <br />
-                              <span
-                                style={{ fontSize: "18px", fontWeight: "700" }}
+                                <img
+                                  src={job.companyLogo}
+                                  alt="..."
+                                  className={
+                                    typoClasses.imgRaised +
+                                    " " +
+                                    typoClasses.imgRoundedCircle +
+                                    " " +
+                                    typoClasses.imgFluid
+                                  }
+                                />
+                              </GridItem>
+                              <GridItem
+                                xs={8}
+                                sm={8}
+                                md={8}
+                                style={{ paddingLeft: "0px" }}
                               >
-                                React Engineer
-                              </span>
-                              <br />
-                              <span
-                                style={{ fontSize: "13px", fontWeight: 500 }}
-                              >
-                                Software Development | Internship | Anywhere in
-                                the world
-                              </span>
-                            </GridItem>
-                            <GridItem xs={2} sm={2} md={2}>
-                              <span
-                                style={{ fontSize: "16px", fontWeight: 600 }}
-                              >
-                                Oct 13
-                              </span>
-                            </GridItem>
-                          </GridContainer>
-                        </CardBody>
-                      </Card>
-                    ),
+                                <span
+                                  style={{ fontSize: "13px", fontWeight: 600 }}
+                                >
+                                  {job.companyName}
+                                </span>
+                                <br />
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  {job.position}
+                                </span>
+                                <br />
+                                <span
+                                  style={{ fontSize: "13px", fontWeight: 500 }}
+                                >
+                                  {job.category} | {job.jobType} |{" "}
+                                  {job.candidateRegion ||
+                                    "Anywehere in the world"}
+                                </span>
+                              </GridItem>
+                              <GridItem xs={2} sm={2} md={2}>
+                                <span
+                                  style={{ fontSize: "16px", fontWeight: 600 }}
+                                >
+                                  {moment(job.createdAt).format("MMM") +
+                                    " " +
+                                    moment(job.createdAt).format("DD")}
+                                </span>
+                              </GridItem>
+                            </GridContainer>
+                          </CardBody>
+                        </Card>
+                      </RouterLink>
+                    )),
                   },
                   {
                     tabButton: "Applied Jobs",
                     tabIcon: Done,
-                    tabContent: (
-                      <Card>
-                        <CardBody>
-                          <GridContainer
-                            justify="start"
-                            alignItems="center"
-                            className="roboto-slab"
-                            style={{ color: "#3c4858" }}
-                          >
-                            <GridItem
-                              xs={2}
-                              sm={2}
-                              md={2}
-                              style={{ paddingLeft: "0px" }}
+                    tabContent: applied.data.payload.jobData.map((job) => (
+                      <RouterLink to={`/job/${job._id}`} key={job._id}>
+                        <Card>
+                          <CardBody>
+                            <GridContainer
+                              justify="start"
+                              alignItems="center"
+                              className="roboto-slab"
+                              style={{ color: "#3c4858" }}
                             >
-                              <img
-                                src={image}
-                                alt="..."
-                                className={
-                                  typoClasses.imgRaised +
-                                  " " +
-                                  typoClasses.imgRoundedCircle +
-                                  " " +
-                                  typoClasses.imgFluid
-                                }
-                              />
-                            </GridItem>
-                            <GridItem
-                              xs={7}
-                              sm={7}
-                              md={7}
-                              style={{ paddingLeft: "0px" }}
-                            >
-                              <span
-                                style={{ fontSize: "13px", fontWeight: 600 }}
+                              <GridItem
+                                xs={2}
+                                sm={2}
+                                md={2}
+                                style={{ paddingLeft: "0px" }}
                               >
-                                Podsights
-                              </span>
-                              <br />
-                              <span
-                                style={{ fontSize: "18px", fontWeight: "700" }}
+                                <img
+                                  src={job.companyLogo}
+                                  alt="..."
+                                  className={
+                                    typoClasses.imgRaised +
+                                    " " +
+                                    typoClasses.imgRoundedCircle +
+                                    " " +
+                                    typoClasses.imgFluid
+                                  }
+                                />
+                              </GridItem>
+                              <GridItem
+                                xs={7}
+                                sm={7}
+                                md={7}
+                                style={{ paddingLeft: "0px" }}
                               >
-                                React Engineer
-                              </span>
-                              <br />
-                              <span
-                                style={{ fontSize: "13px", fontWeight: 500 }}
+                                <span
+                                  style={{ fontSize: "13px", fontWeight: 600 }}
+                                >
+                                  {job.companyName}
+                                </span>
+                                <br />
+                                <span
+                                  style={{
+                                    fontSize: "18px",
+                                    fontWeight: "700",
+                                  }}
+                                >
+                                  {job.position}
+                                </span>
+                                <br />
+                                <span
+                                  style={{ fontSize: "13px", fontWeight: 500 }}
+                                >
+                                  {job.category} | {job.jobType} |{" "}
+                                  {job.candidateRegion ||
+                                    "Anywhere in the world"}
+                                </span>
+                              </GridItem>
+                              <GridItem
+                                xs={3}
+                                sm={3}
+                                md={3}
+                                style={{ textAlign: "center" }}
                               >
-                                Software Development | Internship | Anywhere in
-                                the world
-                              </span>
-                            </GridItem>
-                            <GridItem
-                              xs={3}
-                              sm={3}
-                              md={3}
-                              style={{ textAlign: "center" }}
-                            >
-                              <span
-                                style={{
-                                  fontSize: "12px",
-                                  fontWeight: 500,
-                                }}
-                              >
-                                STATUS
-                              </span>
-                              <br />
-                              <span
-                                style={{ fontSize: "12px", fontWeight: 600 }}
-                              >
-                                Technical Interview
-                              </span>
-                            </GridItem>
-                          </GridContainer>
-                        </CardBody>
-                      </Card>
-                    ),
+                                <span
+                                  style={{
+                                    fontSize: "12px",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  STATUS
+                                </span>
+                                <br />
+                                <span
+                                  style={{ fontSize: "12px", fontWeight: 600 }}
+                                >
+                                  Technical Interview
+                                </span>
+                              </GridItem>
+                            </GridContainer>
+                          </CardBody>
+                        </Card>
+                      </RouterLink>
+                    )),
                   },
                 ]}
               />
