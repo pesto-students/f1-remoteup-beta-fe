@@ -59,7 +59,7 @@ export default function App(props) {
           action={(snackbarKey) => (
             <SnackbarCloseButton snackbarKey={snackbarKey} />
           )}
-          maxSnack={4}
+          maxSnack={1}
           anchorOrigin={{
             vertical: "bottom",
             horizontal: "right",
