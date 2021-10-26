@@ -198,7 +198,7 @@ export default function Dashboard(props) {
                 }}
                 className="roboto-slab"
               >
-                70
+                {data.payload.totalApplication}
               </h2>
               <h3
                 style={{
