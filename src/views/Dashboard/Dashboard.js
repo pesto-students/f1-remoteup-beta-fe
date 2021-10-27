@@ -180,7 +180,7 @@ export default function Dashboard(props) {
                   }}
                 />
                 {"  "}
-                Active Jobs
+                Active {data.payload.totalActiveJobs > 1 ? "Jobs" : "Job"}
               </h3>
             </GridItem>
             <GridItem
@@ -218,7 +218,10 @@ export default function Dashboard(props) {
                   }}
                 />
                 {"  "}
-                Applications Received
+                {data.payload.totalApplication > 1
+                  ? "Applications "
+                  : "Application "}
+                Received
               </h3>
 
               {/* <h5 className="roboto-slab">
