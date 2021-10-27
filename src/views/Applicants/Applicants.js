@@ -4,6 +4,19 @@ import { Redirect } from "react-router-dom";
 import classNames from "classnames";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
+import Slide from "@material-ui/core/Slide";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogActions from "@material-ui/core/DialogActions";
+import IconButton from "@material-ui/core/IconButton";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import { Input } from "@material-ui/core";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 // @material-ui/icons
 import SubjectIcon from "@mui/icons-material/Subject";
@@ -16,11 +29,8 @@ import Edit from "@material-ui/icons/Edit";
 import Close from "@material-ui/icons/Close";
 import Done from "@material-ui/icons/Done";
 import AttachFile from "@mui/icons-material/AttachFile";
+import Notes from "@material-ui/icons/Notes";
 
-// @material-ui/core
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
-import Slide from "@material-ui/core/Slide";
 import { useSnackbar } from "notistack";
 
 // core components
@@ -36,14 +46,142 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 import tableStyle from "assets/jss/material-kit-react/contentAreas";
+import modalStyle from "assets/jss/material-kit-react/modalStyle.js";
+import customSelectStyle from "assets/jss/material-kit-react/customSelectStyle";
 
 // Sections for this page
 import ProductSection from "../LandingPage/Sections/ProductSection.js";
 import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
-import { useQuery, useQueries } from "react-query";
+import { useQuery, useQueries, useMutation } from "react-query";
+
 import moment from "moment";
+
+const useStyles = makeStyles(styles);
+const useTableStyles = makeStyles(tableStyle);
+const useModalStyles = makeStyles(modalStyle);
+const useSelectStyles = makeStyles(customSelectStyle);
+
+const dashboardRoutes = [];
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="down" ref={ref} {...props} />;
+});
+
+function NoteModal(props) {
+  const [modal, setModal] = React.useState(false);
+  const modalClasses = useModalStyles();
+  const selectClasses = useSelectStyles();
+  // const inputText = useRef(props.note);
+  const [inputText, setInputText] = React.useState(props.note);
+  const [newValue, setNewValue] = React.useState(props.note);
+  const { state } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const mutationNote = useMutation(
+    (newNote) =>
+      fetch(
+        `http://127.0.0.1:8000/recruiter/applicants/updatenote/${props.id}`,
+        {
+          method: "PATCH",
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+            "Content-Type": "application/json",
+          }),
+          body: newNote,
+        }
+      ).then((res) => res.json()),
+    {
+      onSuccess: (result, variables, context) => {
+        // alert(JSON.stringify(result, null, 2));
+        // Success notification
+        setModal(false);
+        enqueueSnackbar("Note Saved", {
+          variant: "success",
+        });
+        setNewValue(inputText);
+        // alert(noteValue);
+      },
+      onError: (error, veriaables, context) => alert(error),
+    }
+  );
+
+  const processSave = () => {
+    mutationNote.mutate(JSON.stringify({ note: inputText }, null, 2));
+  };
+
+  return (
+    <>
+      <Button justIcon size="sm" color="info" onClick={() => setModal(true)}>
+        <Notes />
+      </Button>
+      <Dialog
+        classes={{
+          root: modalClasses.center,
+          paper: modalClasses.modal,
+        }}
+        open={modal}
+        TransitionComponent={Transition}
+        keepMounted
+        maxWidth="xs"
+        fullWidth
+        onClose={() => setModal(false)}
+        aria-labelledby="modal-slide-title"
+        aria-describedby="modal-slide-description"
+      >
+        <DialogTitle
+          id="classic-modal-slide-title"
+          disableTypography
+          className={modalClasses.modalHeader}
+        >
+          <IconButton
+            className={modalClasses.modalCloseButton}
+            key="close"
+            aria-label="Close"
+            color="inherit"
+            onClick={() => setModal(false)}
+          >
+            <Close className={modalClasses.modalClose} />
+          </IconButton>
+          <h4 className={modalClasses.modalTitle}>Relevant Notes</h4>
+        </DialogTitle>
+        <DialogContent
+          id="modal-slide-description"
+          className={modalClasses.modalBody}
+        >
+          <CustomInput
+            id="notes"
+            formControlProps={{
+              fullWidth: true,
+            }}
+            inputProps={{
+              placeholder: "Write candidate's notes here..",
+              multiline: true,
+              rows: 7,
+              value: inputText,
+              onChange: (e) => setInputText(e.target.value),
+            }}
+          />
+        </DialogContent>
+        <DialogActions
+          className={
+            modalClasses.modalFooter + " " + modalClasses.modalFooterCenter
+          }
+        >
+          <Button
+            disabled={inputText === newValue}
+            onClick={processSave}
+            color="success"
+          >
+            <Done />
+            <span className="right-link">Save</span>
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
 
 function openBase64NewTab(base64Pdf) {
   var blob = base64toBlob(base64Pdf);
@@ -75,72 +213,165 @@ function base64toBlob(base64Data) {
   return new Blob(byteArrays, { type: "application/pdf" });
 }
 
-const dashboardRoutes = [];
-
-const useStyles = makeStyles(styles);
-const useTableStyles = makeStyles(tableStyle);
-
 function Status(props) {
   const [edit, setEdit] = React.useState(false);
-  const [inputText, setInputText] = React.useState("");
+  const [selectStatus, setSelectStatus] = React.useState(props.status);
   const [status, setStatus] = React.useState(props.status);
   const { enqueueSnackbar } = useSnackbar();
+  const selectClasses = useSelectStyles();
+  const { state } = useAuth();
 
-  // const handleClick = () => {
-  //   setOpen(true);
-  // };
-
-  // const handleClose = (event, reason) => {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
-
-  //   setOpen(false);
-  // };
-
-  // useEffect(() => {
-  //   console.log("DOne");
-  // }, [open]);
-
-  const handleSuccess = () => {
-    enqueueSnackbar("The status have been changed.", { variant: "success" });
-    setEdit(false);
-    setStatus(inputText);
+  const handleSelect = (event) => {
+    setSelectStatus(event.target.value);
   };
+
+  const mutationStatus = useMutation(
+    (newStatus) =>
+      fetch(
+        `http://127.0.0.1:8000/recruiter/applicants/updateappstatus/${props.id}`,
+        {
+          method: "PATCH",
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+            "Content-Type": "application/json",
+          }),
+          body: newStatus,
+        }
+      ).then((res) => res.json()),
+    {
+      onSuccess: (result, variables, context) => {
+        // Success notification
+        // alert(result);
+        enqueueSnackbar("The status have been changed.", {
+          variant: "success",
+        });
+        setEdit(false);
+        setStatus(selectStatus);
+      },
+      onError: (error, variables, context) => alert(error),
+    }
+  );
+
+  // const handleSuccess = () => {
+  //   enqueueSnackbar("The status have been changed.", { variant: "success" });
+  //   setEdit(false);
+  //   setStatus(selectStatus);
+  // };
 
   const handleEdit = () => {
     setEdit(true);
   };
 
+  const handleClose = () => {
+    setEdit(false);
+  };
+
   return edit ? (
     <>
-      <CustomInput
-        inputProps={{
-          id: "status",
-          ref: { inputText },
-          name: "status",
-          style: { width: "70px" },
-          onChange: (e) => setInputText(e.target.value),
-          // onBlur: formik.handleBlur,
-          // placeholder:
-          //   "e.g. React Engineer, Lead Developer, Marketing Manager..",
-          // value: formik.values.position,
-          // error: formik.touched.position && Boolean(formik.errors.position),
-        }}
-        id="status"
-        formControlProps={{
-          fullWidth: false,
-          style: { paddingTop: "5px", margin: "0px" },
-        }}
-      />
+      <FormControl className={selectClasses.selectFormControlStatus}>
+        <InputLabel
+          htmlFor="simple-select"
+          className={selectClasses.selectLabel}
+        ></InputLabel>
+        <Select
+          MenuProps={{
+            className: selectClasses.selectMenu,
+          }}
+          classes={{
+            select: selectClasses.select,
+          }}
+          value={selectStatus}
+          onChange={handleSelect}
+          inputProps={{
+            name: "selectStatus",
+            id: "select-status",
+          }}
+        >
+          <MenuItem
+            disabled
+            classes={{
+              root: selectClasses.selectMenuItem,
+            }}
+          >
+            Select Status
+          </MenuItem>
+          <MenuItem
+            classes={{
+              root: selectClasses.selectMenuItem,
+              selected: selectClasses.selectMenuItemSelected,
+            }}
+            value="Applied"
+          >
+            Applied
+          </MenuItem>
+          <MenuItem
+            classes={{
+              root: selectClasses.selectMenuItem,
+              selected: selectClasses.selectMenuItemSelected,
+            }}
+            value="Technical Test"
+          >
+            Technical Test
+          </MenuItem>
+          <MenuItem
+            classes={{
+              root: selectClasses.selectMenuItem,
+              selected: selectClasses.selectMenuItemSelected,
+            }}
+            value="Technical Interview"
+          >
+            Technical Interview
+          </MenuItem>
+          <MenuItem
+            classes={{
+              root: selectClasses.selectMenuItem,
+              selected: selectClasses.selectMenuItemSelected,
+            }}
+            value="Final Interview"
+          >
+            Final Interview
+          </MenuItem>
+          <MenuItem
+            classes={{
+              root: selectClasses.selectMenuItem,
+              selected: selectClasses.selectMenuItemSelected,
+            }}
+            value="Rejected"
+          >
+            Rejected
+          </MenuItem>
+          <MenuItem
+            classes={{
+              root: selectClasses.selectMenuItem,
+              selected: selectClasses.selectMenuItemSelected,
+            }}
+            value="Selected"
+          >
+            Selected
+          </MenuItem>
+        </Select>
+      </FormControl>
       <Button
-        style={{ marginLeft: "10px" }}
+        disabled={selectStatus === status}
+        style={{ marginLeft: "3px" }}
         justIcon
         size="sm"
         color="success"
-        onClick={handleSuccess}
+        onClick={() => {
+          let obj = JSON.stringify({ status: selectStatus }, null, 2);
+          mutationStatus.mutate(obj);
+        }}
       >
         <Done />
+      </Button>
+      <Button
+        style={{ marginLeft: "1px" }}
+        justIcon
+        size="sm"
+        color="danger"
+        onClick={handleClose}
+      >
+        <Close />
       </Button>
     </>
   ) : (
@@ -239,18 +470,28 @@ export default function Applicants(props) {
       app.exp,
       moment(app.createdAt).format("MMM") +
         " " +
-        moment(app.createdAt).format("DD"),
+        moment(app.createdAt).format("DD") +
+        ", " +
+        moment(app.createdAt).format("YYYY"),
       <Button
         style={{ marginLeft: "10px" }}
         justIcon
-        round
         size="sm"
         color="info"
         onClick={() => openBase64NewTab(app.resume.split(",")[1])}
       >
         <AttachFile />
       </Button>,
-      <Status status={app.applicationStatus} />,
+      <>
+        <Status id={app._id} status={app.applicationStatus} />
+        <NoteModal
+          note
+          setNote
+          id={app._id}
+          name={app.fullName}
+          note={app.note}
+        />
+      </>,
     ])
   );
 
@@ -279,7 +520,7 @@ export default function Applicants(props) {
               paddingTop: "100px",
               paddingBottom: "130px",
             }}
-            justify="start"
+            justify="center"
             alignItems="center"
           >
             <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
@@ -323,12 +564,12 @@ export default function Applicants(props) {
               </h5>
             </GridItem>
             <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
-            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
+            {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
             <GridItem
-              xs={10}
-              sm={10}
-              md={10}
-              lg={10}
+              xs={11}
+              sm={11}
+              md={11}
+              lg={11}
               style={{ marginTop: "18px", textAlign: "left" }}
             >
               <h3
@@ -342,9 +583,9 @@ export default function Applicants(props) {
                 Applicants
               </h3>
             </GridItem>
-            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
-            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
-            <GridItem xs={10} sm={10} md={10} lg={10}>
+            {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
+            {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
+            <GridItem xs={11} sm={11} md={11} lg={11}>
               <Table
                 tableHead={[
                   "#",
@@ -354,7 +595,7 @@ export default function Applicants(props) {
                   "Exp.(Yrs.)",
                   "Submitted",
                   "Resume",
-                  "Status",
+                  "Status / Notes",
                 ]}
                 tableData={apps}
                 customCellClasses={[
@@ -381,7 +622,7 @@ export default function Applicants(props) {
                 customHeadClassesForCells={[0, 1, 2, 3, 4, 5, 6, 7]}
               />
             </GridItem>
-            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
+            {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
           </GridContainer>
         </div>
       </div>

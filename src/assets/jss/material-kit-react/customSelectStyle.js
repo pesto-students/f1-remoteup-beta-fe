@@ -12,11 +12,11 @@ import {
 const customSelectStyle = {
   select: {
     padding: "12px 0 7px",
-    fontSize: ".75rem",
+    fontSize: "0.875rem", // Changed from 0.75 rem to 0.875rem
     fontWeight: "400",
     lineHeight: "1.42857",
     textDecoration: "none",
-    // textTransform: "uppercase",
+    // textTransform: "uppercase", // commented
     color: grayColor[1],
     letterSpacing: "0",
     "&:focus": {
@@ -27,6 +27,21 @@ const customSelectStyle = {
     },
     "& + input + svg": {
       transition: "all 300ms linear",
+    },
+  },
+  selectFormControlStatus: {
+    // created new class for status update
+    marginTop: "-16px",
+    width: "110px",
+    // margin: "10px 1px 10px 0px !important",
+    "& > div": {
+      "&:before": {
+        borderBottomWidth: "1px !important",
+        borderBottomColor: grayColor[11] + " !important",
+      },
+      "&:after": {
+        borderBottomColor: infoColor[0] + " !important", //!important //changes made here
+      },
     },
   },
   selectFormControl: {
