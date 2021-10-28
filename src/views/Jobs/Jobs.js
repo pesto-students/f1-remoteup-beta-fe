@@ -183,7 +183,7 @@ export default function Jobs(props) {
                                 >
                                   {job.category} | {job.jobType} |{" "}
                                   {job.candidateRegion ||
-                                    "Anywehere in the world"}
+                                    "Anywhere in the world"}
                                 </span>
                               </GridItem>
                               <GridItem xs={2} sm={2} md={2}>
@@ -279,7 +279,8 @@ export default function Jobs(props) {
                                 <span
                                   style={{ fontSize: "12px", fontWeight: 600 }}
                                 >
-                                  Technical Interview
+                                  {job.applications[0].applicationStatus ||
+                                    "Applied"}
                                 </span>
                               </GridItem>
                             </GridContainer>
