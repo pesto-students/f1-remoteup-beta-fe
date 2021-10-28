@@ -22,6 +22,8 @@ import Jobs from "views/Jobs/Jobs";
 import JobApply from "views/JobApply/JobApply";
 import JobDetails from "views/JobDetails/JobDetails";
 import Applicants from "views/Applicants/Applicants";
+import EditAJob from "views/EditAJob/EditAJob";
+
 import { AuthProvider } from "components/AuthProvider/AuthProvider";
 
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -29,7 +31,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 
 var hist = createBrowserHistory();
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 function SnackbarCloseButton({ snackbarKey }) {
   const { closeSnackbar } = useSnackbar();
@@ -38,7 +40,7 @@ function SnackbarCloseButton({ snackbarKey }) {
     <IconButton onClick={() => closeSnackbar(snackbarKey)}>
       <IconClose
         style={{
-          color: "white",
+          color: "#3c4858",
           width: "14px",
           height: "14px",
           verticalAlign: "middle",
@@ -54,28 +56,44 @@ export default function App(props) {
       <AuthProvider>
         <SnackbarProvider
           iconVariant={{
-            success: <SuccessIcon style={{ marginRight: "10px" }} />,
+            success: (
+              <SuccessIcon
+                style={{
+                  marginRight: "10px",
+                  marginLeft: "-5px",
+                  color: "#4caf50",
+                }}
+              />
+            ),
           }}
           action={(snackbarKey) => (
             <SnackbarCloseButton snackbarKey={snackbarKey} />
           )}
           maxSnack={1}
           anchorOrigin={{
-            vertical: "bottom",
+            vertical: "top",
             horizontal: "right",
           }}
           TransitionComponent={Slide}
-          style={{ fontFamily: "Roboto Slab" }}
+          style={{
+            fontFamily: "Roboto Slab",
+            marginTop: "100px",
+            backgroundColor: "white",
+            borderLeftColor: "#4caf50",
+            borderLeftWidth: "0.382rem",
+            borderLeftStyle: "solid",
+            color: "#3c4858",
+          }}
         >
           <Router history={hist}>
             <Switch>
               <Route path="/post-a-job" component={PostAJob} />
               <Route path="/dashboard" component={Dashboard} />
-              {/* <Route path="/applicants" component={Applicants} /> */}
               <Route path="/jobs" component={Jobs} />
               <Route path="/job/:jobId" component={JobDetails} />
               <Route path="/apply/:jobId" component={JobApply} />
               <Route path="/applicants/:jobId" component={Applicants} />
+              <Route path="/edit/:jobId" component={EditAJob} />
               {/* <Route path="/landing-page" component={LandingPage} />
           <Route path="/profile-page" component={ProfilePage} />
           <Route path="/login-page" component={LoginPage} />
