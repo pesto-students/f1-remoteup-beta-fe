@@ -248,6 +248,12 @@ export default function FormSection(props) {
         values.companyDescriptionState = convertToRaw(
           editorStateCompany.getCurrentContent()
         );
+        const obj = {
+          name: values.logoFile.name,
+          type: values.logoFile.type,
+          size: values.logoFile.size,
+        };
+        values.logoFile = obj;
         // values.companyDescriptionState = "";
         // values.jobDescriptionState = "";
         // this.setState({
