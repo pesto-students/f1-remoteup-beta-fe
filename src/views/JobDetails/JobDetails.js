@@ -90,14 +90,57 @@ export default function JobDetails(props) {
 
   console.log(state.isAuthenticated);
 
+  // const applied = useQuery(
+  //   `applied-${jobId}`,
+  //   () => {
+  //     return fetch(`http://127.0.0.1:8000/jobseeker/job/viewappliedjobs`, {
+  //       headers: new Headers({
+  //         Authorization: `Bearer ${state.accessToken}`,
+  //       }),
+  //     }).then((res) => res.json());
+  //   },
+  //   {
+  //     onSuccess: (result, variables, context) => {
+  //       const allSaved = [];
+  //       result.data.payload.jobData.map((job) => allSaved.push(job._id));
+  //       if (allSaved.includes(jobId)) {
+  //         setIsSaved(true);
+  //       }
+  //     },
+  //     onError: (error, variables, context) => alert(error),
+  //     // enabled: state.role === "Jobseeker",
+  //   }
+  // );
+
+  // const saved = useQuery(
+  //   `saved-${jobId}`,
+  //   () => {
+  //     return fetch(`http://127.0.0.1:8000/jobseeker/job/viewsavedjobs`, {
+  //       headers: new Headers({
+  //         Authorization: `Bearer ${state.accessToken}`,
+  //       }),
+  //     }).then((res) => res.json());
+  //   },
+  //   {
+  //     onSuccess: (result, variables, context) => {
+  //       const allSaved = [];
+  //       result.data.payload.jobData.map((job) => allSaved.push(job._id));
+  //       if (allSaved.includes(jobId)) {
+  //         setIsSaved(true);
+  //       }
+  //     },
+  //     onError: (error, variables, context) => alert(error),
+  //     // enabled: state.role === "Jobseeker",
+  //   }
+  // );
+
   const queries = useQueries([
     {
       queryKey: `job-${jobId}`,
-      queryFn: () => {
-        return fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then(
-          (res) => res.json()
-        );
-      },
+      queryFn: () =>
+        fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
+          res.json()
+        ),
     },
     {
       queryKey: `savedjobs`,
@@ -108,6 +151,13 @@ export default function JobDetails(props) {
           }),
         }).then((res) => res.json());
       },
+      // onSuccess: (result, variables, context) => {
+      //   const allSaved = [];
+      //   saved.data.payload.jobData.map((job) => allSaved.push(job._id));
+      //   if (allSaved.includes(jobId)) {
+      //     setIsSaved(true);
+      //   }
+      // },
     },
     {
       queryKey: `appliedjobs`,
@@ -118,57 +168,72 @@ export default function JobDetails(props) {
           }),
         }).then((res) => res.json());
       },
+      // onSuccess: (result, variables, context) => {
+      //   const allApplied = [];
+      //   applied.data.payload.jobData.map((job) => {
+      //     allApplied.push(job._id);
+      //   });
+      //   if (allApplied.includes(jobId)) {
+      //     setIsApplied(true);
+      //   }
+      // },
     },
   ]);
+
   const [job, saved, applied] = queries;
 
   React.useEffect(() => {
-    if (state.isAuthenticated && applied.data) {
-      const allApplied = [];
-      applied.data.payload.jobData.map((job) => {
-        allApplied.push(job._id);
-      });
-      if (allApplied.includes(jobId)) {
-        setIsApplied(true);
+    if (state.role === "Jobseeker") {
+      if (saved.data && !saved.isLoading && !saved.error) {
+        const allSaved = [];
+        saved.data.payload.jobData.map((job) => allSaved.push(job._id));
+        if (allSaved.includes(jobId)) {
+          setIsSaved(true);
+        }
+      }
+      if (applied.data) {
+        const allApplied = [];
+        applied.data.payload.jobData.map((job) => {
+          allApplied.push(job._id);
+        });
+        if (allApplied.includes(jobId)) {
+          setIsApplied(true);
+        }
       }
     }
-    if (state.isAuthenticated && saved.data) {
-      const allSaved = [];
-      saved.data.payload.jobData.map((job) => allSaved.push(job._id));
-      if (allSaved.includes(jobId)) {
-        setIsSaved(true);
-      }
+  }, [applied.data, saved.data]);
+
+  const mutation = useMutation(
+    () => {
+      return fetch(
+        `http://127.0.0.1:8000/jobseeker/job/saveunsavejob/${jobId}`,
+        {
+          method: "PATCH",
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+            "Content-Type": "application/json",
+          }),
+        }
+      );
+    },
+    {
+      onSuccess: (result, variables, context) => {
+        if (isSaved) {
+          setIsSaved(false);
+          enqueueSnackbar("Job Unsaved", {
+            variant: "success",
+          });
+        } else {
+          setIsSaved(true);
+          enqueueSnackbar("Job Saved", {
+            variant: "success",
+          });
+        }
+      },
     }
-  });
+  );
 
-  const mutation = useMutation(() => {
-    return fetch(`http://127.0.0.1:8000/jobseeker/job/saveunsavejob/${jobId}`, {
-      method: "PATCH",
-      headers: new Headers({
-        Authorization: `Bearer ${state.accessToken}`,
-        "Content-Type": "application/json",
-      }),
-    });
-  });
-
-  function processSave() {
-    if (isSaved) {
-      setIsSaved(false);
-      enqueueSnackbar("Job Unsaved", {
-        variant: "success",
-      });
-    } else {
-      setIsSaved(true);
-      enqueueSnackbar("Job Saved", {
-        variant: "success",
-      });
-    }
-    mutation.mutate();
-  }
-
-  React.useEffect(() => {
-    console.log("Updated");
-  }, [isApplied, isSaved]);
+  // React.useEffect(() => console.log("."), [isApplied, isSaved]);
 
   // const { isLoading, error, data } = useQuery(`job-${jobId}`, () =>
   //   fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
@@ -181,7 +246,7 @@ export default function JobDetails(props) {
   }
 
   if (job.error) {
-    return "An error occured " + error.message;
+    return "An error occured";
   }
 
   const data = job.data;
@@ -203,9 +268,6 @@ export default function JobDetails(props) {
       <ScrollToTopOnMount />
       <div className={classNames(classes.mainDiv)}>
         <div className={classes.container} style={{ minHeight: "900px" }}>
-          {/* <ProductSection />
-          <TeamSection /> */}
-          {/* <WorkSection name="Applied/Saved Jobs..." /> */}
           <GridContainer
             style={{
               color: "#3C4858",
@@ -336,7 +398,11 @@ export default function JobDetails(props) {
               )}
               {state.role === "Jobseeker" && (
                 <>
-                  <Button onClick={() => processSave()} fullWidth color="info">
+                  <Button
+                    onClick={() => mutation.mutate()}
+                    fullWidth
+                    color="info"
+                  >
                     {isSaved ? (
                       <>
                         <Done />
@@ -350,12 +416,7 @@ export default function JobDetails(props) {
                     )}
                   </Button>
                   {isApplied ? (
-                    <Button
-                      // component={Link}
-                      // to={`/apply/${jobId}`}
-                      fullWidth
-                      color="facebook"
-                    >
+                    <Button fullWidth color="facebook">
                       <Done />
                       <span className="right-link">Applied</span>
                     </Button>
@@ -396,7 +457,16 @@ export default function JobDetails(props) {
                   __html: data.payload.jobData.companyDescription,
                 }}
               ></div>
-
+              {/* <h4
+                className="roboto-slab"
+                style={{
+                  fontSize: "1.27rem",
+                  fontWeight: "700",
+                  paddingTop: "30px",
+                }}
+              >
+                Job Description
+              </h4> */}
               <div
                 style={{ fontSize: "1rem" }}
                 className="roboto-slab"
@@ -404,121 +474,6 @@ export default function JobDetails(props) {
                   __html: data.payload.jobData.jobDescription,
                 }}
               ></div>
-
-              {/* <p className="roboto-slab" style={{ fontSize: "14px" }}>
-                Podsights is a small, distributed organization seeking a Data
-                Engineer to join our growing team! Here's a little about us, a
-                little about what we believe, and what we are looking for.
-                <br />
-                <br />
-                Podsights is an industry-leading attribution platform for
-                podcast advertising. We likely work with some of your favorite
-                brands and publishers and handle over 10 billion events a month.
-                Our mission is simple, we are looking to grow the podcast
-                industry. Far too many brands try a podcast advertising campaign
-                and churn. Or worse: they don’t even try to enter the market. By
-                providing a platform for brands to optimize results, we
-                encourage investment in podcast advertising, and by proxy to
-                publishers.
-              </p>
-              <h4
-                className="roboto-slab"
-                style={{
-                  fontSize: "1.27rem",
-                  fontWeight: "700",
-                  paddingTop: "30px",
-                }}
-              >
-                Responsibilities
-              </h4>
-              <p className="roboto-slab" style={{ fontSize: "14px" }}>
-                <ul>
-                  <li>Leading a team</li>
-                  <li>
-                    Requirements gathering, analysis and processing with the
-                    Product team and BA
-                  </li>
-                  <li>
-                    Develop and maintain the tech documentation (prepare
-                    specs/data flow diagrams/mockups etc.)
-                  </li>
-                  <li>
-                    Split tasks into subtasks within the scope and provide the
-                    detailed estimation
-                  </li>
-                  <li>
-                    Setup and maintain the infra, write the code in full
-                    compliance with the best practices and perform the initial
-                    testing to confirm the code quality and successful path
-                  </li>
-                  <li>
-                    Perform deployments across environments in accordance with
-                    the existing CI/CD flow and code promotion standards
-                  </li>
-                  <li>
-                    Troubleshoot issues, write detailed and easy to understand
-                    RCA reports and troubleshooting guides in Jira, Confluence
-                  </li>
-                  <li>
-                    Set up and maintain effective communication with
-                    stakeholders on requirements, development, quality issues,
-                    R&D
-                  </li>
-                  <li>
-                    Assess the release management process and timely product
-                    delivery{" "}
-                  </li>
-                </ul>
-              </p>
-              <h4
-                className="roboto-slab"
-                style={{
-                  fontSize: "1.27rem",
-                  fontWeight: "700",
-                  paddingTop: "30px",
-                }}
-              >
-                Requirements
-              </h4>
-              <p className="roboto-slab" style={{ fontSize: "14px" }}>
-                <ul>
-                  <li>Leading a team</li>
-                  <li>
-                    Requirements gathering, analysis and processing with the
-                    Product team and BA
-                  </li>
-                  <li>
-                    Develop and maintain the tech documentation (prepare
-                    specs/data flow diagrams/mockups etc.)
-                  </li>
-                  <li>
-                    Split tasks into subtasks within the scope and provide the
-                    detailed estimation
-                  </li>
-                  <li>
-                    Setup and maintain the infra, write the code in full
-                    compliance with the best practices and perform the initial
-                    testing to confirm the code quality and successful path
-                  </li>
-                  <li>
-                    Perform deployments across environments in accordance with
-                    the existing CI/CD flow and code promotion standards
-                  </li>
-                  <li>
-                    Troubleshoot issues, write detailed and easy to understand
-                    RCA reports and troubleshooting guides in Jira, Confluence
-                  </li>
-                  <li>
-                    Set up and maintain effective communication with
-                    stakeholders on requirements, development, quality issues,
-                    R&D
-                  </li>
-                  <li>
-                    Assess the release management process and timely product
-                    delivery{" "}
-                  </li>
-                </ul>
-              </p> */}
             </GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
             <GridItem xs={4} sm={4} md={4} lg={4}></GridItem>
@@ -530,7 +485,11 @@ export default function JobDetails(props) {
                 </Button>
               )}
               {state.role === "Jobseeker" && (
-                <Button onClick={() => processSave()} fullWidth color="info">
+                <Button
+                  onClick={() => mutation.mutate()}
+                  fullWidth
+                  color="info"
+                >
                   {isSaved ? (
                     <>
                       <Done />
@@ -559,12 +518,7 @@ export default function JobDetails(props) {
               {state.role === "Jobseeker" && (
                 <>
                   {isApplied ? (
-                    <Button
-                      // component={Link}
-                      // to={`/apply/${jobId}`}
-                      fullWidth
-                      color="facebook"
-                    >
+                    <Button fullWidth color="facebook">
                       <Done />
                       <span className="right-link">Applied</span>
                     </Button>
@@ -583,9 +537,6 @@ export default function JobDetails(props) {
               )}
             </GridItem>
             <GridItem xs={4} sm={4} md={4} lg={4}></GridItem>
-            {/* <GridItem xs={8} sm={8} md={2} lg={2}>
-                    <h3>Podsights</h3>
-                  </GridItem> */}
           </GridContainer>
         </div>
       </div>
