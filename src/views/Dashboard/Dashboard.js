@@ -14,6 +14,14 @@ import Schedule from "@material-ui/icons/Schedule";
 import Person from "@material-ui/icons/Person";
 import Edit from "@material-ui/icons/Edit";
 import Close from "@material-ui/icons/Close";
+import Done from "@material-ui/icons/Done";
+
+import Slide from "@material-ui/core/Slide";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogActions from "@material-ui/core/DialogActions";
+import IconButton from "@material-ui/core/IconButton";
 
 import Live from "assets/img/pulse-outline.svg";
 import AppTray from "assets/img/file-tray-full-outline.svg";
@@ -27,22 +35,142 @@ import Button from "components/CustomButtons/Button.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
 import Parallax from "components/Parallax/Parallax.js";
 import Table from "components/Table/Table.js";
+import CustomInput from "components/CustomInput/CustomInput.js";
 
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 import tableStyle from "assets/jss/material-kit-react/contentAreas";
+import modalStyle from "assets/jss/material-kit-react/modalStyle.js";
 
 // Sections for this page
 import ProductSection from "../LandingPage/Sections/ProductSection.js";
 import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 import { useAuth } from "components/AuthProvider/AuthProvider.js";
-import { useQuery } from "react-query";
+import { useQuery, useMutation } from "react-query";
 import moment from "moment";
+import { useSnackbar } from "notistack";
+import { queryClient } from "app.js";
 
 const dashboardRoutes = [];
 
 const useStyles = makeStyles(styles);
 const useTableStyles = makeStyles(tableStyle);
+const useModalStyles = makeStyles(modalStyle);
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="down" ref={ref} {...props} />;
+});
+
+function DeleteModal(props) {
+  const [modal, setModal] = React.useState(false);
+  const modalClasses = useModalStyles();
+  const [inputText, setInputText] = React.useState(props.note);
+  const [newValue, setNewValue] = React.useState(props.note);
+  const { state } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const mutation = useMutation(
+    () =>
+      fetch(`http://127.0.0.1:8000/recruiter/job/deletejob/${props.id}`, {
+        method: "DELETE",
+        headers: new Headers({
+          Authorization: `Bearer ${state.accessToken}`,
+          "Content-Type": "application/json",
+        }),
+      }).then((res) => res.json()),
+    {
+      onSuccess: (result, variables, context) => {
+        // Success notification
+        setModal(false);
+        enqueueSnackbar("Job Deleted", {
+          variant: "success",
+        });
+        // Refetch dashboard query
+        queryClient.invalidateQueries("dashboard");
+      },
+      onError: (error, veriaables, context) => alert(error),
+    }
+  );
+
+  const processSave = () => {
+    mutation.mutate();
+  };
+
+  return (
+    <>
+      <Button justIcon size="sm" color="danger" onClick={() => setModal(true)}>
+        <Close />
+      </Button>
+      <Dialog
+        classes={{
+          root: modalClasses.center,
+          paper: modalClasses.modal,
+        }}
+        open={modal}
+        TransitionComponent={Transition}
+        keepMounted
+        maxWidth="xs"
+        fullWidth
+        onClose={() => setModal(false)}
+        aria-labelledby="modal-slide-title"
+        aria-describedby="modal-slide-description"
+      >
+        <DialogTitle
+          id="classic-modal-slide-title"
+          disableTypography
+          className={modalClasses.modalHeader}
+        >
+          <IconButton
+            style={{ margin: "0px" }}
+            className={modalClasses.modalCloseButton}
+            key="close"
+            aria-label="Close"
+            color="inherit"
+            onClick={() => setModal(false)}
+          >
+            <Close className={modalClasses.modalClose} />
+          </IconButton>
+          <h4 className={modalClasses.modalTitle + " roboto-slab"}>
+            Delete Job
+          </h4>
+        </DialogTitle>
+        <DialogContent
+          id="modal-slide-description"
+          className={modalClasses.modalBody}
+        >
+          <h5 className="roboto-slab" style={{ fontSize: "0.9375rem" }}>
+            {props.applyType === "ATS" &&
+              "All applicants data will be deleted."}
+            {props.applyType === "ATS" && <br />}
+            Are you sure you want to delete the job?
+          </h5>
+        </DialogContent>
+        <DialogActions
+          className={
+            modalClasses.modalFooter + " " + modalClasses.modalFooterCenter
+          }
+        >
+          <Button color="info" onClick={() => setModal(false)}>
+            <Close />
+            <span className="right-link">Cancel</span>
+          </Button>
+          <Button onClick={() => mutation.mutate()} color="danger">
+            <Done />
+            <span className="right-link">Delete</span>
+          </Button>
+          {/* <Button
+            disabled={inputText === newValue}
+            onClick={processSave}
+            color="success"
+          >
+            <Done />
+            <span className="right-link">Save</span>
+          </Button> */}
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
 
 function Actions(props) {
   return (
@@ -56,12 +184,18 @@ function Actions(props) {
       >
         <Person />
       </Button>
-      <Button justIcon size="sm" color="success">
+      <Button
+        component={Link}
+        to={`/edit/${props.id}`}
+        justIcon
+        size="sm"
+        color="success"
+      >
         <Edit />
       </Button>
-      <Button justIcon size="sm" color="danger">
+      {/* <Button justIcon size="sm" color="danger">
         <Close />
-      </Button>
+      </Button> */}
     </>
   );
 }
@@ -112,7 +246,10 @@ export default function Dashboard(props) {
         " " +
         moment(job.createdAt).format("DD"),
       job.planType,
-      <Actions id={job._id} />,
+      <>
+        <Actions id={job._id} />
+        <DeleteModal id={job._id} applyType={job.applyType} />
+      </>,
     ])
   );
 
