@@ -11,10 +11,6 @@ import { Close as IconClose } from "@material-ui/icons";
 import SuccessIcon from "@mui/material/internal/svg-icons/SuccessOutlined";
 
 // pages for this product
-import Components from "views/Components/Components.js";
-import LandingPage from "views/LandingPage/LandingPage.js";
-import ProfilePage from "views/ProfilePage/ProfilePage.js";
-import LoginPage from "views/LoginPage/LoginPage.js";
 import RemoteUpLanding from "views/LandingPage/LandingPage";
 import PostAJob from "views/PostAJob/PostAJob";
 import Dashboard from "views/Dashboard/Dashboard";

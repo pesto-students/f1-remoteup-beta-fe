@@ -45,7 +45,6 @@ import imagesStyles from "assets/jss/material-kit-react/imagesStyles.js";
 import typoStyles from "assets/jss/material-kit-react/views/componentsSections/typographyStyle.js";
 
 import image from "assets/img/faces/avatar.jpg";
-import podsights from "../LandingPage/Sections/podsights.jpeg";
 
 // Sections for this page
 import ProductSection from "../LandingPage/Sections/ProductSection.js";

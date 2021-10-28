@@ -5,8 +5,6 @@ import { makeStyles } from "@material-ui/core/styles";
 
 // @material-ui/icons
 
-import { Link } from "@mui/material";
-
 // core components
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -20,16 +18,9 @@ import { cardTitle } from "assets/jss/material-kit-react.js";
 import imagesStyles from "assets/jss/material-kit-react/imagesStyles.js";
 import typoStyles from "assets/jss/material-kit-react/views/componentsSections/typographyStyle.js";
 
-import image from "assets/img/faces/avatar.jpg";
-import logo from "./logo1.jpeg";
-import everli from "./everli.png";
-import podsights from "./podsights.jpeg";
-import toptal from "./toptal.png";
-import axios from "axios";
 import moment from "moment";
 
 import { useQuery } from "react-query";
-import { createJSDocCallbackTag } from "typescript";
 
 const cardStyles = {
   ...imagesStyles,
