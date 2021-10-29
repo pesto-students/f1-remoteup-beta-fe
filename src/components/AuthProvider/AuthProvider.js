@@ -7,14 +7,33 @@ const AuthContext = React.createContext();
 function authReducer(state, action) {
   switch (action.type) {
     case "LOGIN": {
-      return { ...action.payload, isAuthenticated: true };
+      return {
+        ...action.payload,
+        isAuthenticated: true,
+        category: state.category,
+        search: state.search,
+      };
     }
     case "LOGOUT": {
       localStorage.removeItem("authResult");
       localStorage.removeItem("isAuthenticated");
       localStorage.removeItem("role");
       localStorage.removeItem("profile");
-      return { isAuthenticated: false, role: "undefined" };
+      return {
+        isAuthenticated: false,
+        role: "undefined",
+        category: state.category,
+        search: state.search,
+      };
+    }
+    case "CATEGORY": {
+      return {
+        ...state,
+        category: action.category,
+      };
+    }
+    case "SEARCH": {
+      return { ...state, search: action.search };
     }
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -70,12 +89,16 @@ function AuthProvider({ children }) {
     initialState = {
       isAuthenticated: localStorage.getItem("isAuthenticated"),
       role: localStorage.getItem("role"),
+      category: "All",
+      search: "",
       ...JSON.parse(localStorage.getItem("authResult")),
     };
   } else {
     initialState = {
       isAuthenticated: false,
       role: "undefined",
+      category: "All",
+      search: "",
     };
   }
   const [state, dispatch] = useReducer(authReducer, initialState);
