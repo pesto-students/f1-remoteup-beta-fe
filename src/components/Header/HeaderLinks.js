@@ -33,7 +33,7 @@ import { lockJS } from "components/AuthProvider/lockJS";
 import { lockRE } from "components/AuthProvider/lockRE";
 import { useAuth } from "components/AuthProvider/AuthProvider";
 
-import EmailModal from "components/Email Modal/EmailModal";
+import EmailModal from "components/EmailModal/EmailModal";
 
 import image from "assets/img/bg.jpg";
 import profileImage from "assets/img/faces/avatar.jpg";
@@ -64,7 +64,7 @@ export default function HeaderLinks(props) {
     <List className={classes.list}>
       {/* Modal window, if email not verified */}
       {profile.email_verified !== undefined && !profile.email_verified && (
-        <Modal />
+        <EmailModal />
       )}
 
       {/* Home link */}
