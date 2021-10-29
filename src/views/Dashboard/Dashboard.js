@@ -214,14 +214,6 @@ export default function Dashboard(props) {
     }).then((res) => res.json())
   );
 
-  if (isLoading) {
-    return "...isLoading";
-  }
-
-  if (error) {
-    return "An error occured " + error.message;
-  }
-
   const jobs = [];
 
   const fillButtons = [
@@ -236,22 +228,34 @@ export default function Dashboard(props) {
     );
   });
 
-  data.payload.jobData.map((job, index) =>
-    jobs.push([
-      index + 1,
-      job.position,
-      job.category,
-      job.jobType,
-      moment(job.createdAt).format("MMM") +
-        " " +
-        moment(job.createdAt).format("DD"),
-      job.planType,
-      <>
-        <Actions id={job._id} />
-        <DeleteModal id={job._id} applyType={job.applyType} />
-      </>,
-    ])
-  );
+  if (isLoading) {
+    return "...isLoading";
+  }
+
+  if (error) {
+    return "An error occured " + error.message;
+  }
+
+  if (data) {
+    data.payload.jobData.map((job, index) =>
+      jobs.push([
+        index + 1,
+        job.position,
+        job.category,
+        job.jobType,
+        moment(job.createdAt).format("MMM") +
+          " " +
+          moment(job.createdAt).format("DD"),
+        job.planType,
+        <>
+          <Actions id={job._id} />
+          <DeleteModal id={job._id} applyType={job.applyType} />
+        </>,
+      ])
+    );
+  } else {
+    return "...isLoading";
+  }
 
   return state.isAuthenticated && state.role === "Recruiter" ? (
     <div>
