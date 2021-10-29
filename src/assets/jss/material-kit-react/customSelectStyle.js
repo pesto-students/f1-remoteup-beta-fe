@@ -29,6 +29,21 @@ const customSelectStyle = {
       transition: "all 300ms linear",
     },
   },
+  selectFormControlCategory: {
+    // created new class for status update
+    marginTop: "-19px",
+    // width: "110px",
+    // margin: "10px 1px 10px 0px !important",
+    "& > div": {
+      "&:before": {
+        borderBottomWidth: "1px !important",
+        borderBottomColor: grayColor[11] + " !important",
+      },
+      "&:after": {
+        borderBottomColor: infoColor[0] + " !important", //!important //changes made here
+      },
+    },
+  },
   selectFormControlStatus: {
     // created new class for status update
     marginTop: "-16px",
