@@ -186,7 +186,7 @@ export default function HeaderLinks(props) {
                 {state.role === "Recruiter" && profile.name !== undefined && (
                   <strong>
                     {profile["https://remoteup.io/user_metadata"].name ||
-                      "Minith"}
+                      "Sachin"}
                     !
                   </strong>
                 )}
@@ -207,7 +207,10 @@ export default function HeaderLinks(props) {
                 />
                 {"  "}
                 <span className="right-link">
-                  {profile.given_name || "Minith"}
+                  {state.role === "Jobseeker" && profile.given_name}
+                  {state.role === "Recruiter" &&
+                    profile["https://remoteup.io/user_metadata"] &&
+                    profile["https://remoteup.io/user_metadata"].name}
                 </span>
               </span>
             }
