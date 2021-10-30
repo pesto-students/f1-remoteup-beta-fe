@@ -15,6 +15,7 @@ import Person from "@material-ui/icons/Person";
 import Edit from "@material-ui/icons/Edit";
 import Close from "@material-ui/icons/Close";
 import Done from "@material-ui/icons/Done";
+import Launch from "@material-ui/icons/Launch";
 
 import Slide from "@material-ui/core/Slide";
 import Dialog from "@material-ui/core/Dialog";
@@ -178,15 +179,17 @@ function DeleteModal(props) {
 function Actions(props) {
   return (
     <>
-      <Button
-        component={Link}
-        to={`/applicants/${props.id}`}
-        justIcon
-        size="sm"
-        color="info"
-      >
-        <Person />
-      </Button>
+      {props.applyType === "ATS" && (
+        <Button
+          component={Link}
+          to={`/applicants/${props.id}`}
+          justIcon
+          size="sm"
+          color="info"
+        >
+          <Person />
+        </Button>
+      )}
       <Button
         component={Link}
         to={`/edit/${props.id}`}
@@ -196,7 +199,9 @@ function Actions(props) {
       >
         <Edit />
       </Button>
-      {/* <Button justIcon size="sm" color="danger">
+      <DeleteModal id={props.id} applyType={props.applyType} />
+
+      {/* <Button round justIcon size="sm" color="danger">
         <Close />
       </Button> */}
     </>
@@ -244,17 +249,26 @@ export default function Dashboard(props) {
     data.payload.jobData.map((job, index) =>
       jobs.push([
         index + 1,
-        job.position,
+        <>
+          {job.position}
+          {/* <Button
+            component={Link}
+            to={`/job/${job._id}`}
+            target="_blank"
+            justIcon
+            size="sm"
+            color="transparent"
+          >
+            <Launch />
+          </Button> */}
+        </>,
         job.category,
         job.jobType,
         moment(job.createdAt).format("MMM") +
           " " +
           moment(job.createdAt).format("DD"),
         job.planType,
-        <>
-          <Actions id={job._id} />
-          <DeleteModal id={job._id} applyType={job.applyType} />
-        </>,
+        <Actions applyType={job.applyType} id={job._id} />,
       ])
     );
   } else {
