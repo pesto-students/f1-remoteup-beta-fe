@@ -47,7 +47,8 @@ const lockRE = new Auth0Lock(
     allowedConnections: ["Username-Password-Authentication"],
     // container: AUTH_CONFIG.container,
     theme: {
-      logo: "https://drive.google.com/uc?export=view&id=1-Z7gjMlh9R_f0YcppuReWog4EaVeV67E",
+      // logo: "https://drive.google.com/uc?export=view&id=1-Z7gjMlh9R_f0YcppuReWog4EaVeV67E",
+      logo: "https://cdn.jsdelivr.net/gh/pesto-students/f1-remoteup-beta-fe@master/src/components/AuthProvider/RemoteUp.png",
       primaryColor: "#00acc1",
       labeledSubmitButton: false,
     },
