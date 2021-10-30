@@ -13,7 +13,7 @@
 2. [Demo](#demo)
 3. [Technology Stack](#technology-stack)
 4. [Installation](#installation)
-5. [Author](#author)
+5. [Authors](#authors)
 6. [License](#license)
 
 <br/>
