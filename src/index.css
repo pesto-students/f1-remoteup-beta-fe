@@ -62,7 +62,7 @@
 .imageDropdownButtonR {
   padding: "0px";
   top: "6px";
-  borderradius: "50%";
+  border-radius: "50%";
   margin-left: "5px";
   /* margin-right: "5px"; */
 }
@@ -71,6 +71,7 @@
   width: "50px";
   top: "4px";
 }
+
 .auth0-lock.auth0-lock .auth0-lock-input-wrap.auth0-lock-input-wrap-with-icon {
   padding-left: 0;
 }
