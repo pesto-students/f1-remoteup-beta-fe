@@ -201,6 +201,7 @@ function Actions(props) {
 }
 
 export default function Dashboard(props) {
+  const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles();
   const tableClasses = useTableStyles();
   const { state } = useAuth();
@@ -255,6 +256,16 @@ export default function Dashboard(props) {
     );
   } else {
     return "...isLoading";
+  }
+
+  if (props.location.search) {
+    const params = new URLSearchParams(props.location.search);
+    if (params.get("session_id")) {
+      enqueueSnackbar("Job posted successfully", {
+        variant: "success",
+      });
+      return <Redirect to="/dashboard" />;
+    }
   }
 
   return state.isAuthenticated && state.role === "Recruiter" ? (

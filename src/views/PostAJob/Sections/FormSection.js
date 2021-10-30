@@ -180,37 +180,38 @@ export default function FormSection(props) {
       // ),
       {
         return fetch("http://127.0.0.1:8000/recruiter/job/postjob", {
-          method: "post",
+          method: "POST",
           headers: new Headers({
             Authorization: `Bearer ${state.accessToken}`,
             "Content-Type": "application/json",
           }),
           body: newJob,
-        });
+        }).then((res) => res.json());
       },
     {
-      onSuccess: () => {
+      onSuccess: (data, variables, context) => {
+        window.location.href = data.message.sessionURL;
         // Success notification
-        enqueueSnackbar("The job have been posted.", {
-          variant: "success",
-        });
+        // enqueueSnackbar("The job have been posted.", {
+        //   variant: "success",
+        // });
       },
     }
   );
-  const sampleMarkup =
-    '<p><strong>Our Stack (we don&#x27;t expect you to have all of these)</strong><br/><br/><br/>Vue + Vuex + Vue Router + Webpack + Less + SCSS<br/>Element UI<br/>FreeMarker<br/>AWS, Circle, Drone CI, K8s<br/><br/><br/><strong>Responsibilities</strong><br/><br/><br/>Develop mobile-first frontends in VueJS<br/><br/><br/>Focus on performance and user experience<br/><br/><br/>Create frontends for the backend management systems<br/><br/><br/>Participate in code reviews with peers and managers to ensure that each increment adheres to original vision as described in the user story and all standard resource libraries and architecture patterns as appropriate<br/><br/><br/>Participate in team ceremonies including planning, grooming, product demonstrations, and team retrospectives<br/><br/><br/>Mentoring less experienced team members<br/><br/><br/><strong>Requirements</strong><br/><br/><br/>Familiarity with at least one: Vue, React, Angular<br/><br/><br/>Familiarity with Git, ES6, Webpack, Less or Sass, and NodeJS<br/><br/><br/>Familiarity with state management like Vuex, Redux, Ngrx<br/><br/><br/>Excellent communication skills <br/><br/><br/>Knowledge of backend stack is a plus<br/><br/><br/>Based in Europe</p><p><strong>Benefits</strong><br/><br/><br/>Quarterly and flash bonuses<br/>Flexible working hours<br/>Top-of-the-line equipment<br/>Education allowance<br/>Referral bonuses<br/>Annual company holidays - we’re hoping to make it to Dubai this year<br/>Highly talented, dependable co-workers in a global, multicultural organisation<br/>We score 100% on The Joel Test<br/>Our EU team is small enough for you to be impactful<br/>Our business is globally established and successful, offering stability and security to our Team Members</p><a href="http://www.facebook.com">Example link</a>';
+  // const sampleMarkup =
+  //   '<p><strong>Our Stack (we don&#x27;t expect you to have all of these)</strong><br/><br/><br/>Vue + Vuex + Vue Router + Webpack + Less + SCSS<br/>Element UI<br/>FreeMarker<br/>AWS, Circle, Drone CI, K8s<br/><br/><br/><strong>Responsibilities</strong><br/><br/><br/>Develop mobile-first frontends in VueJS<br/><br/><br/>Focus on performance and user experience<br/><br/><br/>Create frontends for the backend management systems<br/><br/><br/>Participate in code reviews with peers and managers to ensure that each increment adheres to original vision as described in the user story and all standard resource libraries and architecture patterns as appropriate<br/><br/><br/>Participate in team ceremonies including planning, grooming, product demonstrations, and team retrospectives<br/><br/><br/>Mentoring less experienced team members<br/><br/><br/><strong>Requirements</strong><br/><br/><br/>Familiarity with at least one: Vue, React, Angular<br/><br/><br/>Familiarity with Git, ES6, Webpack, Less or Sass, and NodeJS<br/><br/><br/>Familiarity with state management like Vuex, Redux, Ngrx<br/><br/><br/>Excellent communication skills <br/><br/><br/>Knowledge of backend stack is a plus<br/><br/><br/>Based in Europe</p><p><strong>Benefits</strong><br/><br/><br/>Quarterly and flash bonuses<br/>Flexible working hours<br/>Top-of-the-line equipment<br/>Education allowance<br/>Referral bonuses<br/>Annual company holidays - we’re hoping to make it to Dubai this year<br/>Highly talented, dependable co-workers in a global, multicultural organisation<br/>We score 100% on The Joel Test<br/>Our EU team is small enough for you to be impactful<br/>Our business is globally established and successful, offering stability and security to our Team Members</p><a href="http://www.facebook.com">Example link</a>';
 
-  const blocksFromHTML = convertFromHTML(sampleMarkup);
-  const jstate = ContentState.createFromBlockArray(
-    blocksFromHTML.contentBlocks,
-    blocksFromHTML.entityMap
-  );
+  // const blocksFromHTML = convertFromHTML(sampleMarkup);
+  // const jstate = ContentState.createFromBlockArray(
+  //   blocksFromHTML.contentBlocks,
+  //   blocksFromHTML.entityMap
+  // );
   const planPrice = { "1 Month": 199, "2 Month": 299, "3 Month": 399 };
   const formik = useFormik({
     initialValues: {
       position: "",
-      category: "",
-      jobType: "",
+      category: "Software Development",
+      jobType: "Full-Time",
       salary: "",
       candidateRegion: "",
       applyType: "",
