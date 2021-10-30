@@ -31,6 +31,8 @@ import Done from "@material-ui/icons/Done";
 import AttachFile from "@mui/icons-material/AttachFile";
 import Notes from "@material-ui/icons/Notes";
 
+import Money from "assets/img/cash-outline.svg";
+
 import { useSnackbar } from "notistack";
 
 // core components
@@ -561,6 +563,24 @@ export default function Applicants(props) {
                   {job.data.payload.jobData.candidateRegion ||
                     "Anywhere in the world"}
                 </span>
+                &nbsp;&nbsp;{" "}
+                {job.data.payload.jobData.salary && (
+                  <>
+                    <img
+                      src={Money}
+                      style={{
+                        height: "24px",
+                        width: "24px",
+                        filter:
+                          "invert(29%) sepia(15%) saturate(700%) hue-rotate(174deg) brightness(91%) contrast(97%)",
+                      }}
+                    />
+                    <span style={{ verticalAlign: "middle" }}>
+                      {" "}
+                      {job.data.payload.jobData.salary}
+                    </span>
+                  </>
+                )}
               </h5>
             </GridItem>
             <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>

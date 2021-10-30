@@ -22,6 +22,8 @@ import Send from "@material-ui/icons/Send";
 import Image from "@material-ui/icons/Image";
 import AttachFile from "@material-ui/icons/AttachFile";
 
+import Money from "assets/img/cash-outline.svg";
+
 // import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 
 import Card from "components/Card/Card.js";
@@ -305,6 +307,24 @@ export default function JobApply(props) {
                     {data.payload.jobData.candidateRegion ||
                       "Anywhere in the world"}
                   </span>
+                  &nbsp;&nbsp;{" "}
+                  {data.payload.jobData.salary && (
+                    <>
+                      <img
+                        src={Money}
+                        style={{
+                          height: "24px",
+                          width: "24px",
+                          filter:
+                            "invert(29%) sepia(15%) saturate(700%) hue-rotate(174deg) brightness(91%) contrast(97%)",
+                        }}
+                      />
+                      <span style={{ verticalAlign: "middle" }}>
+                        {" "}
+                        {data.payload.jobData.salary}
+                      </span>
+                    </>
+                  )}
                 </h5>
               </GridItem>
               <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
