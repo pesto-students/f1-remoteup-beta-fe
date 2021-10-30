@@ -175,7 +175,7 @@ export default function FormEditSection(props) {
   const mutation = useMutation(
     (editJob) =>
       // axios.post(
-      //   "http://127.0.0.1:8000/recruiter/job/postjob",
+      //   `${process.env.REACT_APP_SERVER_URL}/recruiter/job/postjob`,
       //   {
       //     Authorization: `Bearer ${state.accessToken}`,
       //     "Content-Type": "application/json",
@@ -183,14 +183,17 @@ export default function FormEditSection(props) {
       //   newJob
       // ),
       {
-        return fetch(`http://127.0.0.1:8000/recruiter/job/editjob/${jobId}`, {
-          method: "PATCH",
-          headers: new Headers({
-            Authorization: `Bearer ${state.accessToken}`,
-            "Content-Type": "application/json",
-          }),
-          body: editJob,
-        });
+        return fetch(
+          `${process.env.REACT_APP_SERVER_URL}/recruiter/job/editjob/${jobId}`,
+          {
+            method: "PATCH",
+            headers: new Headers({
+              Authorization: `Bearer ${state.accessToken}`,
+              "Content-Type": "application/json",
+            }),
+            body: editJob,
+          }
+        );
       },
     {
       onSuccess: () => {
@@ -285,9 +288,9 @@ export default function FormEditSection(props) {
   const { isLoading, error, data } = useQuery(
     `edit-${jobId}`,
     () =>
-      fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
-        res.json()
-      ),
+      fetch(
+        `${process.env.REACT_APP_SERVER_URL}/public/job/viewjob/${jobId}`
+      ).then((res) => res.json()),
     {
       cacheTime: 30000000,
       onSuccess: (data) => {

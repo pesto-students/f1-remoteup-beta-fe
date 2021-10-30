@@ -171,7 +171,7 @@ export default function FormSection(props) {
   const mutation = useMutation(
     (newJob) =>
       // axios.post(
-      //   "http://127.0.0.1:8000/recruiter/job/postjob",
+      //   `${process.env.REACT_APP_SERVER_URL}/recruiter/job/postjob`,
       //   {
       //     Authorization: `Bearer ${state.accessToken}`,
       //     "Content-Type": "application/json",
@@ -179,14 +179,17 @@ export default function FormSection(props) {
       //   newJob
       // ),
       {
-        return fetch("http://127.0.0.1:8000/recruiter/job/postjob", {
-          method: "POST",
-          headers: new Headers({
-            Authorization: `Bearer ${state.accessToken}`,
-            "Content-Type": "application/json",
-          }),
-          body: newJob,
-        }).then((res) => res.json());
+        return fetch(
+          `${process.env.REACT_APP_SERVER_URL}/recruiter/job/postjob`,
+          {
+            method: "POST",
+            headers: new Headers({
+              Authorization: `Bearer ${state.accessToken}`,
+              "Content-Type": "application/json",
+            }),
+            body: newJob,
+          }
+        ).then((res) => res.json());
       },
     {
       onSuccess: (data, variables, context) => {

@@ -131,7 +131,7 @@ export default function JobApply(props) {
   const mutation = useMutation(
     (newApp) =>
       // axios.post(
-      //   "http://127.0.0.1:8000/recruiter/job/postjob",
+      //   `${process.env.REACT_APP_SERVER_URL}/recruiter/job/postjob`,
       //   {
       //     Authorization: `Bearer ${state.accessToken}`,
       //     "Content-Type": "application/json",
@@ -139,14 +139,17 @@ export default function JobApply(props) {
       //   newJob
       // ),
       {
-        return fetch(`http://127.0.0.1:8000/jobseeker/job/applyjob/${jobId}`, {
-          method: "PATCH",
-          headers: new Headers({
-            Authorization: `Bearer ${state.accessToken}`,
-            "Content-Type": "application/json",
-          }),
-          body: newApp,
-        });
+        return fetch(
+          `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/applyjob/${jobId}`,
+          {
+            method: "PATCH",
+            headers: new Headers({
+              Authorization: `Bearer ${state.accessToken}`,
+              "Content-Type": "application/json",
+            }),
+            body: newApp,
+          }
+        );
       },
     {
       onSuccess: () => {
@@ -188,9 +191,9 @@ export default function JobApply(props) {
   });
 
   const { isLoading, error, data } = useQuery(`apply-${jobId}`, () =>
-    fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
-      res.json()
-    )
+    fetch(
+      `${process.env.REACT_APP_SERVER_URL}/public/job/viewjob/${jobId}`
+    ).then((res) => res.json())
   );
 
   if (isLoading) {

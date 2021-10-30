@@ -71,13 +71,16 @@ function DeleteModal(props) {
 
   const mutation = useMutation(
     () =>
-      fetch(`http://127.0.0.1:8000/recruiter/job/deletejob/${props.id}`, {
-        method: "DELETE",
-        headers: new Headers({
-          Authorization: `Bearer ${state.accessToken}`,
-          "Content-Type": "application/json",
-        }),
-      }).then((res) => res.json()),
+      fetch(
+        `${process.env.REACT_APP_SERVER_URL}/recruiter/job/deletejob/${props.id}`,
+        {
+          method: "DELETE",
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+            "Content-Type": "application/json",
+          }),
+        }
+      ).then((res) => res.json()),
     {
       onSuccess: (result, variables, context) => {
         // Success notification
@@ -208,7 +211,7 @@ export default function Dashboard(props) {
   const { ...rest } = props;
 
   const { isLoading, error, data } = useQuery("dashboard", () =>
-    fetch("http://127.0.0.1:8000/recruiter/job/viewjobs", {
+    fetch(`${process.env.REACT_APP_SERVER_URL}/recruiter/job/viewjobs`, {
       headers: new Headers({
         Authorization: `Bearer ${state.accessToken}`,
       }),

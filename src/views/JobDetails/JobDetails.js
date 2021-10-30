@@ -92,7 +92,7 @@ export default function JobDetails(props) {
   // const applied = useQuery(
   //   `applied-${jobId}`,
   //   () => {
-  //     return fetch(`http://127.0.0.1:8000/jobseeker/job/viewappliedjobs`, {
+  //     return fetch(`${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewappliedjobs`, {
   //       headers: new Headers({
   //         Authorization: `Bearer ${state.accessToken}`,
   //       }),
@@ -114,7 +114,7 @@ export default function JobDetails(props) {
   // const saved = useQuery(
   //   `saved-${jobId}`,
   //   () => {
-  //     return fetch(`http://127.0.0.1:8000/jobseeker/job/viewsavedjobs`, {
+  //     return fetch(`${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewsavedjobs`, {
   //       headers: new Headers({
   //         Authorization: `Bearer ${state.accessToken}`,
   //       }),
@@ -137,18 +137,21 @@ export default function JobDetails(props) {
     {
       queryKey: `job-${jobId}`,
       queryFn: () =>
-        fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
-          res.json()
-        ),
+        fetch(
+          `${process.env.REACT_APP_SERVER_URL}/public/job/viewjob/${jobId}`
+        ).then((res) => res.json()),
     },
     {
       queryKey: `savedjobs`,
       queryFn: () => {
-        return fetch(`http://127.0.0.1:8000/jobseeker/job/viewsavedjobs`, {
-          headers: new Headers({
-            Authorization: `Bearer ${state.accessToken}`,
-          }),
-        }).then((res) => res.json());
+        return fetch(
+          `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewsavedjobs`,
+          {
+            headers: new Headers({
+              Authorization: `Bearer ${state.accessToken}`,
+            }),
+          }
+        ).then((res) => res.json());
       },
       // onSuccess: (result, variables, context) => {
       //   const allSaved = [];
@@ -161,11 +164,14 @@ export default function JobDetails(props) {
     {
       queryKey: `appliedjobs`,
       queryFn: () => {
-        return fetch(`http://127.0.0.1:8000/jobseeker/job/viewappliedjobs`, {
-          headers: new Headers({
-            Authorization: `Bearer ${state.accessToken}`,
-          }),
-        }).then((res) => res.json());
+        return fetch(
+          `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewappliedjobs`,
+          {
+            headers: new Headers({
+              Authorization: `Bearer ${state.accessToken}`,
+            }),
+          }
+        ).then((res) => res.json());
       },
       // onSuccess: (result, variables, context) => {
       //   const allApplied = [];
@@ -205,7 +211,7 @@ export default function JobDetails(props) {
   const mutation = useMutation(
     () => {
       return fetch(
-        `http://127.0.0.1:8000/jobseeker/job/saveunsavejob/${jobId}`,
+        `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/saveunsavejob/${jobId}`,
         {
           method: "PATCH",
           headers: new Headers({
@@ -235,7 +241,7 @@ export default function JobDetails(props) {
   // React.useEffect(() => console.log("."), [isApplied, isSaved]);
 
   // const { isLoading, error, data } = useQuery(`job-${jobId}`, () =>
-  //   fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then((res) =>
+  //   fetch(`${process.env.REACT_APP_SERVER_URL}/public/job/viewjob/${jobId}`).then((res) =>
   //     res.json()
   //   )
   // );

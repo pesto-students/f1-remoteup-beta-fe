@@ -82,7 +82,7 @@ function NoteModal(props) {
   const mutationNote = useMutation(
     (newNote) =>
       fetch(
-        `http://127.0.0.1:8000/recruiter/applicants/updatenote/${props.id}`,
+        `${process.env.REACT_APP_SERVER_URL}/recruiter/applicants/updatenote/${props.id}`,
         {
           method: "PATCH",
           headers: new Headers({
@@ -228,7 +228,7 @@ function Status(props) {
   const mutationStatus = useMutation(
     (newStatus) =>
       fetch(
-        `http://127.0.0.1:8000/recruiter/applicants/updateappstatus/${props.id}`,
+        `${process.env.REACT_APP_SERVER_URL}/recruiter/applicants/updateappstatus/${props.id}`,
         {
           method: "PATCH",
           headers: new Headers({
@@ -401,16 +401,16 @@ export default function Applicants(props) {
     {
       queryKey: `job-${jobId}`,
       queryFn: () => {
-        return fetch(`http://127.0.0.1:8000/public/job/viewjob/${jobId}`).then(
-          (res) => res.json()
-        );
+        return fetch(
+          `${process.env.REACT_APP_SERVER_URL}/public/job/viewjob/${jobId}`
+        ).then((res) => res.json());
       },
     },
     {
       queryKey: `applicants-${jobId}`,
       queryFn: () => {
         return fetch(
-          `http://127.0.0.1:8000/recruiter/applicants/viewapplications/${jobId}`,
+          `${process.env.REACT_APP_SERVER_URL}/recruiter/applicants/viewapplications/${jobId}`,
           {
             headers: new Headers({
               Authorization: `Bearer ${state.accessToken}`,

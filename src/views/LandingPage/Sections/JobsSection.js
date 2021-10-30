@@ -42,15 +42,15 @@ export default function JobsSection(props) {
 
   if (state.category === "All") {
     if (state.search) {
-      homeJobsURL = `http://127.0.0.1:8000/public/job/homejobs/?searchKey=${state.search}`;
+      homeJobsURL = `${process.env.REACT_APP_SERVER_URL}/public/job/homejobs/?searchKey=${state.search}`;
     } else {
-      homeJobsURL = `http://127.0.0.1:8000/public/job/homejobs`;
+      homeJobsURL = `${process.env.REACT_APP_SERVER_URL}/public/job/homejobs`;
     }
   } else {
     if (state.search) {
-      homeJobsURL = `http://127.0.0.1:8000/public/job/viewjobs/${state.category}/?searchKey=${state.search}`;
+      homeJobsURL = `${process.env.REACT_APP_SERVER_URL}/public/job/viewjobs/${state.category}/?searchKey=${state.search}`;
     } else {
-      homeJobsURL = `http://127.0.0.1:8000/public/job/viewjobs/${state.category}`;
+      homeJobsURL = `${process.env.REACT_APP_SERVER_URL}/public/job/viewjobs/${state.category}`;
     }
   }
 

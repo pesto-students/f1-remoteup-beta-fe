@@ -69,21 +69,27 @@ export default function Jobs(props) {
     {
       queryKey: `savedjobs`,
       queryFn: () => {
-        return fetch(`http://127.0.0.1:8000/jobseeker/job/viewsavedjobs`, {
-          headers: new Headers({
-            Authorization: `Bearer ${state.accessToken}`,
-          }),
-        }).then((res) => res.json());
+        return fetch(
+          `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewsavedjobs`,
+          {
+            headers: new Headers({
+              Authorization: `Bearer ${state.accessToken}`,
+            }),
+          }
+        ).then((res) => res.json());
       },
     },
     {
       queryKey: `appliedjobs`,
       queryFn: () => {
-        return fetch(`http://127.0.0.1:8000/jobseeker/job/viewappliedjobs`, {
-          headers: new Headers({
-            Authorization: `Bearer ${state.accessToken}`,
-          }),
-        }).then((res) => res.json());
+        return fetch(
+          `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewappliedjobs`,
+          {
+            headers: new Headers({
+              Authorization: `Bearer ${state.accessToken}`,
+            }),
+          }
+        ).then((res) => res.json());
       },
     },
   ]);
