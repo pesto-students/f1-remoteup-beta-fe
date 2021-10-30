@@ -73,7 +73,7 @@
 }
 
 .auth0-lock.auth0-lock .auth0-lock-input-wrap.auth0-lock-input-wrap-with-icon {
-  padding-left: 0;
+  padding-left: 0 !important;
 }
 
 .section {
