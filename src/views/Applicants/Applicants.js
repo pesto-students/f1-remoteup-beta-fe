@@ -32,6 +32,7 @@ import AttachFile from "@mui/icons-material/AttachFile";
 import Notes from "@material-ui/icons/Notes";
 
 import Money from "assets/img/cash-outline.svg";
+import Earth from "assets/img/earth.svg";
 
 import { useSnackbar } from "notistack";
 
@@ -557,7 +558,16 @@ export default function Applicants(props) {
                 </span>
               </h5>
               <h5 className="roboto-slab">
-                <World style={{ verticalAlign: "middle" }} />
+                <img
+                  src={Earth}
+                  style={{
+                    height: "24px",
+                    width: "24px",
+                    filter:
+                      "invert(29%) sepia(15%) saturate(700%) hue-rotate(174deg) brightness(91%) contrast(97%)",
+                  }}
+                />
+                {/* <World style={{ verticalAlign: "middle" }} /> */}
                 <span style={{ verticalAlign: "middle" }}>
                   {" "}
                   {job.data.payload.jobData.candidateRegion ||

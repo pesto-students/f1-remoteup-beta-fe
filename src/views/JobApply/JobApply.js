@@ -23,6 +23,7 @@ import Image from "@material-ui/icons/Image";
 import AttachFile from "@material-ui/icons/AttachFile";
 
 import Money from "assets/img/cash-outline.svg";
+import Earth from "assets/img/earth.svg";
 
 // import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 
@@ -301,7 +302,16 @@ export default function JobApply(props) {
                   </span>
                 </h5>
                 <h5 className="roboto-slab">
-                  <World style={{ verticalAlign: "middle" }} />
+                  <img
+                    src={Earth}
+                    style={{
+                      height: "24px",
+                      width: "24px",
+                      filter:
+                        "invert(29%) sepia(15%) saturate(700%) hue-rotate(174deg) brightness(91%) contrast(97%)",
+                    }}
+                  />
+                  {/* <World style={{ verticalAlign: "middle" }} /> */}
                   <span style={{ verticalAlign: "middle" }}>
                     {" "}
                     {data.payload.jobData.candidateRegion ||
