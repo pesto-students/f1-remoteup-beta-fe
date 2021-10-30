@@ -213,8 +213,8 @@ export default function FormSection(props) {
   const formik = useFormik({
     initialValues: {
       position: "",
-      category: "Software Development",
-      jobType: "Full-Time",
+      category: "",
+      jobType: "",
       salary: "",
       candidateRegion: "",
       applyType: "",
@@ -413,6 +413,7 @@ export default function FormSection(props) {
                       classes={{
                         root: selectClasses.selectMenuItem,
                       }}
+                      value="Select"
                     >
                       Select Category
                     </MenuItem>
