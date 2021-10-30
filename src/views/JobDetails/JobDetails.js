@@ -420,15 +420,36 @@ export default function JobDetails(props) {
                       </>
                     )}
                   </Button>
-                  {isApplied ? (
+                  {isApplied && (
                     <Button fullWidth color="facebook">
                       <Done />
                       <span className="right-link">Applied</span>
                     </Button>
-                  ) : (
+                  )}
+                  {!isApplied && data.payload.jobData.applyType === "ATS" && (
                     <Button
                       component={Link}
                       to={`/apply/${jobId}`}
+                      fullWidth
+                      color="facebook"
+                    >
+                      <MailOutline />
+                      <span className="right-link">Apply</span>
+                    </Button>
+                  )}
+                  {!isApplied && data.payload.jobData.applyType === "Email" && (
+                    <Button
+                      href={"mailto:" + data.payload.jobData.applyValue}
+                      fullWidth
+                      color="facebook"
+                    >
+                      <MailOutline />
+                      <span className="right-link">Apply</span>
+                    </Button>
+                  )}
+                  {!isApplied && data.payload.jobData.applyType === "URL" && (
+                    <Button
+                      href={data.payload.jobData.applyValue}
                       fullWidth
                       color="facebook"
                     >
@@ -522,15 +543,36 @@ export default function JobDetails(props) {
               )}
               {state.role === "Jobseeker" && (
                 <>
-                  {isApplied ? (
+                  {isApplied && (
                     <Button fullWidth color="facebook">
                       <Done />
                       <span className="right-link">Applied</span>
                     </Button>
-                  ) : (
+                  )}
+                  {!isApplied && data.payload.jobData.applyType === "ATS" && (
                     <Button
                       component={Link}
                       to={`/apply/${jobId}`}
+                      fullWidth
+                      color="facebook"
+                    >
+                      <MailOutline />
+                      <span className="right-link">Apply</span>
+                    </Button>
+                  )}
+                  {!isApplied && data.payload.jobData.applyType === "Email" && (
+                    <Button
+                      href={"mailto:" + data.payload.jobData.applyValue}
+                      fullWidth
+                      color="facebook"
+                    >
+                      <MailOutline />
+                      <span className="right-link">Apply</span>
+                    </Button>
+                  )}
+                  {!isApplied && data.payload.jobData.applyType === "URL" && (
+                    <Button
+                      href={data.payload.jobData.applyValue}
                       fullWidth
                       color="facebook"
                     >
