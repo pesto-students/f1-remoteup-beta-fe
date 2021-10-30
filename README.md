@@ -19,7 +19,7 @@
 <br/>
 
 ## Introduction
-RemoteUp is a remote jobs board portal where jobseekers can save & apply for jobs and recruiters can post jobs. It helps recruiters with an inbuilt ATS(Applicants Tracking System) at no extra cost.
+RemoteUp is a remote jobs board portal where jobseekers can save jobs & apply for jobs and recruiters can post jobs. It helps recruiters with an inbuilt ATS(Applicants Tracking System) at no extra cost.
 
 Making this site gave us the opportunity to really stretch out and craft a site with great UX.
 
@@ -55,7 +55,7 @@ We tried to use a completely modern tech stack while testing out some new techno
 ## Installation
 - Fork or directly clone this repository to your local machine
 - Use the `yarn` command to install dependencies
-- Once the dependencies are finished installing, use the `yarn start` command inside the root directory to open the portfolio app in your local browser of choice
+- Once the dependencies are finished installing, use the `yarn start` command inside the root directory to open the app in your local browser of choice
 
 <br/>
 
