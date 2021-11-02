@@ -1,24 +1,30 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/3a60744f-678f-4f08-a360-7d2e2dcb6560/deploy-status)](https://app.netlify.com/sites/remote-up/deploys)
 
 #
+
 <p align="center">
-        <a href="https://remote-up.netlify.app"><img src="./src/components/AuthProvider/RemoteUp.png" height="80">
-        <h4 align="center"></h4><br/></a>
+        <!-- <a href="https://remote-up.netlify.app"> -->
+        <img src="./src/assets/img/RemoteUpLogo.png">
+        <!-- <h4 align="center"></h4> -->
+        <!-- </a> -->
 </p>
 
 #
 
-## Table of Content 
-1. [Introduction](#introduction)
-2. [Demo](#demo)
-3. [Technology Stack](#technology-stack)
-4. [Installation](#installation)
-5. [Authors](#authors)
-6. [License](#license)
+## Table of Content
+
+- [Table of Content](#table-of-content)
+- [Introduction](#introduction)
+- [Demo](#demo)
+- [Technology Stack](#technology-stack)
+- [Installation](#installation)
+- [Authors](#authors)
+- [License](#license)
 
 <br/>
 
 ## Introduction
+
 RemoteUp is a remote jobs board portal where jobseekers can save jobs & apply for jobs and recruiters can post jobs. It helps recruiters with an inbuilt ATS(Applicants Tracking System) at no extra cost.
 
 Making this site gave us the opportunity to really stretch out and craft a site with great UX.
@@ -32,6 +38,7 @@ Welcome! we hope you enjoy the site as much as we enjoyed making it.
 [Live Demo](https://remote-up.netlify.app)
 
 Test Credentials:
+
 - For Recruiter
   - Email: remoteup.recruiter@gmail.com
   - Password: recruiter@1234
@@ -42,6 +49,7 @@ Test Credentials:
 <br/>
 
 ## Technology Stack
+
 We tried to use a completely modern tech stack while testing out some new technologies that we had never used before. This resulted in a fast, performant, and easily-extensible web app that should be fairly future-proof for the coming next several years. We used:
 
 - [Material UI](https://mui.com)
@@ -53,6 +61,7 @@ We tried to use a completely modern tech stack while testing out some new techno
 <br/>
 
 ## Installation
+
 - Fork or directly clone this repository to your local machine
 - Use the `yarn` command to install dependencies
 - Once the dependencies are finished installing, use the `yarn start` command inside the root directory to open the app in your local browser of choice
