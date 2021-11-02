@@ -24,6 +24,7 @@ import { AuthProvider } from "components/AuthProvider/AuthProvider";
 
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
+import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
 
 var hist = createBrowserHistory();
 
@@ -48,58 +49,60 @@ function SnackbarCloseButton({ snackbarKey }) {
 
 export default function App(props) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <SnackbarProvider
-          iconVariant={{
-            success: (
-              <SuccessIcon
-                style={{
-                  marginRight: "10px",
-                  marginLeft: "-5px",
-                  color: "#4caf50",
-                }}
-              />
-            ),
-          }}
-          action={(snackbarKey) => (
-            <SnackbarCloseButton snackbarKey={snackbarKey} />
-          )}
-          maxSnack={1}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          TransitionComponent={Slide}
-          style={{
-            fontFamily: "Roboto Slab",
-            marginTop: "100px",
-            backgroundColor: "white",
-            borderLeftColor: "#4caf50",
-            borderLeftWidth: "0.382rem",
-            borderLeftStyle: "solid",
-            color: "#3c4858",
-          }}
-        >
-          <Router history={hist}>
-            <Switch>
-              <Route path="/post-a-job" component={PostAJob} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/jobs" component={Jobs} />
-              <Route path="/job/:jobId" component={JobDetails} />
-              <Route path="/apply/:jobId" component={JobApply} />
-              <Route path="/applicants/:jobId" component={Applicants} />
-              <Route path="/edit/:jobId" component={EditAJob} />
-              {/* <Route path="/landing-page" component={LandingPage} />
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <SnackbarProvider
+            iconVariant={{
+              success: (
+                <SuccessIcon
+                  style={{
+                    marginRight: "10px",
+                    marginLeft: "-5px",
+                    color: "#4caf50",
+                  }}
+                />
+              ),
+            }}
+            action={(snackbarKey) => (
+              <SnackbarCloseButton snackbarKey={snackbarKey} />
+            )}
+            maxSnack={1}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            TransitionComponent={Slide}
+            style={{
+              fontFamily: "Roboto Slab",
+              marginTop: "100px",
+              backgroundColor: "white",
+              borderLeftColor: "#4caf50",
+              borderLeftWidth: "0.382rem",
+              borderLeftStyle: "solid",
+              color: "#3c4858",
+            }}
+          >
+            <Router history={hist}>
+              <Switch>
+                <Route path="/post-a-job" component={PostAJob} />
+                <Route path="/dashboard" component={Dashboard} />
+                <Route path="/jobs" component={Jobs} />
+                <Route path="/job/:jobId" component={JobDetails} />
+                <Route path="/apply/:jobId" component={JobApply} />
+                <Route path="/applicants/:jobId" component={Applicants} />
+                <Route path="/edit/:jobId" component={EditAJob} />
+                {/* <Route path="/landing-page" component={LandingPage} />
           <Route path="/profile-page" component={ProfilePage} />
           <Route path="/login-page" component={LoginPage} />
           <Route path="/components" component={Components} /> */}
-              <Route path="/" component={RemoteUpLanding} />
-            </Switch>
-          </Router>
-        </SnackbarProvider>
-      </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={true} />
-    </QueryClientProvider>
+                <Route path="/" component={RemoteUpLanding} />
+              </Switch>
+            </Router>
+          </SnackbarProvider>
+        </AuthProvider>
+        <ReactQueryDevtools initialIsOpen={true} />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
