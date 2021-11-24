@@ -124,6 +124,17 @@ function AuthProvider({ children }) {
   console.log(profile);
   useEffect(() => {
     //   When recruiter logs in
+    lockRE.on("show", function () {
+      const isSafari = /^((?!chrome|android).)*safari/i.test(
+        navigator.userAgent
+      );
+      if (isSafari) {
+        lockRE.hide();
+        alert(
+          "For Recruiter login, please don't use Safari, use Chrome or any other browser.\r\n\r\nReason: Auth0 sign-in with username password saves cookies. Due to this app being an eductional project, we don't have a domain. So, Safari will treat it as 3rd party cookie & block it."
+        );
+      }
+    });
     lockRE.on("authenticated", function (authResult) {
       dispatch({
         type: "LOGIN",

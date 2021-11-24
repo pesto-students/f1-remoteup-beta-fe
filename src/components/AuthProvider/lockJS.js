@@ -24,12 +24,21 @@ const lockJS = new Auth0Lock(
       title: "Log In as Jobseeker",
       signUpTitle: "Sign Up as Jobseeker",
       loginWithLabel: "Log In with %s",
+      // loginWithLabel: "%s",
+      passwordInputPlaceholder: "Password: jobseeker@1234",
+      emailInputPlaceholder: "Email: remoteup.jobseeker@gmail.com",
+      socialLoginInstructions:
+        "<div>Select Google </div><div>Email: remoteup.jobseeker@gmail.com</div><div>Password: jobseeker@1234</div>",
+      socialSignUpInstructions: "Hello LinkedIn",
     },
     autoclose: true,
     allowSignUp: true,
     allowShowPassword: true,
     //allowedConnections: ["Username-Password-Authentication"],
     allowedConnections: ["google-oauth2", "linkedin"],
+    prefill: {
+      email: "remoteup.jobseeker@gmail.com",
+    },
     // container: AUTH_CONFIG.container,
     theme: {
       // logo: "https://drive.google.com/uc?export=view&id=1-Z7gjMlh9R_f0YcppuReWog4EaVeV67E",
