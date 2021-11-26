@@ -12,6 +12,7 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
+import Progress from "components/Progress/Progress";
 
 import styles from "assets/jss/material-kit-react/views/landingPageSections/workStyle.js";
 import { cardTitle } from "assets/jss/material-kit-react.js";
@@ -70,9 +71,13 @@ export default function JobsSection(props) {
         }}
       >
         <GridContainer justify="center" alignItems="center">
-          {/* <GridItem xs={3} sm={3} md={3}></GridItem> */}
           <GridItem xs={8} sm={8} md={8}>
-            <h3>Loading....</h3>
+            <h3
+              className={classes.title}
+              style={{ marginBottom: "20px", marginTop: "40px" }}
+            >
+              <Progress />
+            </h3>
           </GridItem>
         </GridContainer>
       </div>

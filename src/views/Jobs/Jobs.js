@@ -29,6 +29,8 @@ import Button from "components/CustomButtons/Button.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
 import Parallax from "components/Parallax/Parallax.js";
 import NavPills from "components/NavPills/NavPills.js";
+import Loading from "components/Loading/Loading.js";
+import Progress from "components/Progress/Progress.js";
 
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 
@@ -96,9 +98,18 @@ export default function Jobs(props) {
   const [saved, applied] = queries;
 
   if (saved.isLoading || applied.isLoading) {
-    return "...isLoading";
+    return <Loading />;
   }
-
+  if (
+    !saved.data ||
+    saved.data.payload === undefined ||
+    saved.data.payload.jobData === undefined ||
+    !applied.data ||
+    applied.data.payload === undefined ||
+    applied.data.payload.jobData === undefined
+  ) {
+    return <Loading />;
+  }
   if (saved.error || applied.error) {
     return "An error occured " + error.message;
   }
@@ -118,7 +129,10 @@ export default function Jobs(props) {
         {...rest}
       />
       <div className={classNames(classes.mainDiv)}>
-        <div className={classes.container} style={{ minHeight: "700px" }}>
+        <div
+          className={classes.container}
+          style={{ minHeight: "700px", paddingBottom: "250px" }}
+        >
           {/* <ProductSection />
           <TeamSection /> */}
           {/* <WorkSection name="Applied/Saved Jobs..." /> */}
@@ -135,165 +149,231 @@ export default function Jobs(props) {
                   {
                     tabButton: "Saved Jobs",
                     tabIcon: BookmarkBorder,
-                    tabContent: saved.data.payload.jobData.map((job) => (
-                      <RouterLink to={`/job/${job._id}`} key={job._id}>
-                        <Card>
-                          <CardBody>
-                            <GridContainer
-                              justify="start"
-                              alignItems="center"
-                              className="roboto-slab"
-                              style={{ color: "#3c4858" }}
-                            >
-                              <GridItem
-                                xs={2}
-                                sm={2}
-                                md={2}
-                                style={{ paddingLeft: "0px" }}
-                              >
-                                <img
-                                  src={job.companyLogo}
-                                  alt="..."
-                                  className={
-                                    typoClasses.imgRaised +
-                                    " " +
-                                    typoClasses.imgRoundedCircle +
-                                    " " +
-                                    typoClasses.imgFluid
-                                  }
-                                />
-                              </GridItem>
-                              <GridItem
-                                xs={8}
-                                sm={8}
-                                md={8}
-                                style={{ paddingLeft: "0px" }}
-                              >
-                                <span
-                                  style={{ fontSize: "13px", fontWeight: 600 }}
+                    tabContent:
+                      !saved.data ||
+                      saved.data.payload === undefined ||
+                      saved.data.payload.jobData === undefined ? (
+                        <div
+                          style={{ textAlign: "center", paddingTop: "50px" }}
+                        >
+                          <Progress />
+                        </div>
+                      ) : saved.data.payload.jobData.length === 0 ? (
+                        <h3
+                          className="roboto-slab"
+                          style={{
+                            fontSize: "20px",
+                            textAlign: "center",
+                            marginTop: "80px",
+                            fontWeight: "700",
+                            color: "#3c4858",
+                          }}
+                        >
+                          No Job Saved Yet
+                        </h3>
+                      ) : (
+                        saved.data.payload.jobData.map((job) => (
+                          <RouterLink to={`/job/${job._id}`} key={job._id}>
+                            <Card>
+                              <CardBody>
+                                <GridContainer
+                                  justify="start"
+                                  alignItems="center"
+                                  className="roboto-slab"
+                                  style={{ color: "#3c4858" }}
                                 >
-                                  {job.companyName}
-                                </span>
-                                <br />
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "700",
-                                  }}
-                                >
-                                  {job.position}
-                                </span>
-                                <br />
-                                <span
-                                  style={{ fontSize: "13px", fontWeight: 500 }}
-                                >
-                                  {job.category} | {job.jobType} |{" "}
-                                  {job.candidateRegion ||
-                                    "Anywhere in the world"}
-                                </span>
-                              </GridItem>
-                              <GridItem xs={2} sm={2} md={2}>
-                                <span
-                                  style={{ fontSize: "16px", fontWeight: 600 }}
-                                >
-                                  {moment(job.createdAt).format("MMM") +
-                                    " " +
-                                    moment(job.createdAt).format("DD")}
-                                </span>
-                              </GridItem>
-                            </GridContainer>
-                          </CardBody>
-                        </Card>
-                      </RouterLink>
-                    )),
+                                  <GridItem
+                                    xs={2}
+                                    sm={2}
+                                    md={2}
+                                    style={{ paddingLeft: "0px" }}
+                                  >
+                                    <img
+                                      src={job.companyLogo}
+                                      alt="..."
+                                      className={
+                                        typoClasses.imgRaised +
+                                        " " +
+                                        typoClasses.imgRoundedCircle +
+                                        " " +
+                                        typoClasses.imgFluid
+                                      }
+                                    />
+                                  </GridItem>
+                                  <GridItem
+                                    xs={8}
+                                    sm={8}
+                                    md={8}
+                                    style={{ paddingLeft: "0px" }}
+                                  >
+                                    <span
+                                      style={{
+                                        fontSize: "13px",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {job.companyName}
+                                    </span>
+                                    <br />
+                                    <span
+                                      style={{
+                                        fontSize: "18px",
+                                        fontWeight: "700",
+                                      }}
+                                    >
+                                      {job.position}
+                                    </span>
+                                    <br />
+                                    <span
+                                      style={{
+                                        fontSize: "13px",
+                                        fontWeight: 500,
+                                      }}
+                                    >
+                                      {job.category} | {job.jobType} |{" "}
+                                      {job.candidateRegion ||
+                                        "Anywhere in the world"}
+                                    </span>
+                                  </GridItem>
+                                  <GridItem xs={2} sm={2} md={2}>
+                                    <span
+                                      style={{
+                                        fontSize: "16px",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {moment(job.createdAt).format("MMM") +
+                                        " " +
+                                        moment(job.createdAt).format("DD")}
+                                    </span>
+                                  </GridItem>
+                                </GridContainer>
+                              </CardBody>
+                            </Card>
+                          </RouterLink>
+                        ))
+                      ),
                   },
                   {
                     tabButton: "Applied Jobs",
                     tabIcon: Done,
-                    tabContent: applied.data.payload.jobData.map((job) => (
-                      <RouterLink to={`/job/${job._id}`} key={job._id}>
-                        <Card>
-                          <CardBody>
-                            <GridContainer
-                              justify="start"
-                              alignItems="center"
-                              className="roboto-slab"
-                              style={{ color: "#3c4858" }}
-                            >
-                              <GridItem
-                                xs={2}
-                                sm={2}
-                                md={2}
-                                style={{ paddingLeft: "0px" }}
-                              >
-                                <img
-                                  src={job.companyLogo}
-                                  alt="..."
-                                  className={
-                                    typoClasses.imgRaised +
-                                    " " +
-                                    typoClasses.imgRoundedCircle +
-                                    " " +
-                                    typoClasses.imgFluid
-                                  }
-                                />
-                              </GridItem>
-                              <GridItem
-                                xs={7}
-                                sm={7}
-                                md={7}
-                                style={{ paddingLeft: "0px" }}
-                              >
-                                <span
-                                  style={{ fontSize: "13px", fontWeight: 600 }}
+                    tabContent:
+                      !applied.data ||
+                      applied.data.payload === undefined ||
+                      applied.data.payload.jobData === undefined ? (
+                        <div
+                          style={{ textAlign: "center", paddingTop: "50px" }}
+                        >
+                          <Progress />
+                        </div>
+                      ) : applied.data.payload.jobData.length === 0 ? (
+                        <h3
+                          className="roboto-slab"
+                          style={{
+                            fontSize: "20px",
+                            textAlign: "center",
+                            marginTop: "80px",
+                            fontWeight: "700",
+                            color: "#3c4858",
+                          }}
+                        >
+                          No Job Applied Yet
+                        </h3>
+                      ) : (
+                        applied.data.payload.jobData.map((job) => (
+                          <RouterLink to={`/job/${job._id}`} key={job._id}>
+                            <Card>
+                              <CardBody>
+                                <GridContainer
+                                  justify="start"
+                                  alignItems="center"
+                                  className="roboto-slab"
+                                  style={{ color: "#3c4858" }}
                                 >
-                                  {job.companyName}
-                                </span>
-                                <br />
-                                <span
-                                  style={{
-                                    fontSize: "18px",
-                                    fontWeight: "700",
-                                  }}
-                                >
-                                  {job.position}
-                                </span>
-                                <br />
-                                <span
-                                  style={{ fontSize: "13px", fontWeight: 500 }}
-                                >
-                                  {job.category} | {job.jobType} |{" "}
-                                  {job.candidateRegion ||
-                                    "Anywhere in the world"}
-                                </span>
-                              </GridItem>
-                              <GridItem
-                                xs={3}
-                                sm={3}
-                                md={3}
-                                style={{ textAlign: "center" }}
-                              >
-                                <span
-                                  style={{
-                                    fontSize: "12px",
-                                    fontWeight: 500,
-                                  }}
-                                >
-                                  STATUS
-                                </span>
-                                <br />
-                                <span
-                                  style={{ fontSize: "12px", fontWeight: 600 }}
-                                >
-                                  {job.applications[0].applicationStatus ||
-                                    "Applied"}
-                                </span>
-                              </GridItem>
-                            </GridContainer>
-                          </CardBody>
-                        </Card>
-                      </RouterLink>
-                    )),
+                                  <GridItem
+                                    xs={2}
+                                    sm={2}
+                                    md={2}
+                                    style={{ paddingLeft: "0px" }}
+                                  >
+                                    <img
+                                      src={job.companyLogo}
+                                      alt="..."
+                                      className={
+                                        typoClasses.imgRaised +
+                                        " " +
+                                        typoClasses.imgRoundedCircle +
+                                        " " +
+                                        typoClasses.imgFluid
+                                      }
+                                    />
+                                  </GridItem>
+                                  <GridItem
+                                    xs={7}
+                                    sm={7}
+                                    md={7}
+                                    style={{ paddingLeft: "0px" }}
+                                  >
+                                    <span
+                                      style={{
+                                        fontSize: "13px",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {job.companyName}
+                                    </span>
+                                    <br />
+                                    <span
+                                      style={{
+                                        fontSize: "18px",
+                                        fontWeight: "700",
+                                      }}
+                                    >
+                                      {job.position}
+                                    </span>
+                                    <br />
+                                    <span
+                                      style={{
+                                        fontSize: "13px",
+                                        fontWeight: 500,
+                                      }}
+                                    >
+                                      {job.category} | {job.jobType} |{" "}
+                                      {job.candidateRegion ||
+                                        "Anywhere in the world"}
+                                    </span>
+                                  </GridItem>
+                                  <GridItem
+                                    xs={3}
+                                    sm={3}
+                                    md={3}
+                                    style={{ textAlign: "center" }}
+                                  >
+                                    <span
+                                      style={{
+                                        fontSize: "12px",
+                                        fontWeight: 500,
+                                      }}
+                                    >
+                                      STATUS
+                                    </span>
+                                    <br />
+                                    <span
+                                      style={{
+                                        fontSize: "12px",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {job.applications[0].applicationStatus ||
+                                        "Applied"}
+                                    </span>
+                                  </GridItem>
+                                </GridContainer>
+                              </CardBody>
+                            </Card>
+                          </RouterLink>
+                        ))
+                      ),
                   },
                 ]}
               />
