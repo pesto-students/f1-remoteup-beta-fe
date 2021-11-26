@@ -223,7 +223,7 @@ export default function HeaderLinks(props) {
               { divider: true },
               [
                 <Link
-                  to="/#"
+                  to={window.location.pathname}
                   onClick={() => dispatch({ type: "LOGOUT" })}
                   className={classes.dropdownLink + " center robot-slab"}
                 >
