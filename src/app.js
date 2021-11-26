@@ -69,13 +69,12 @@ export default function App(props) {
             )}
             maxSnack={1}
             anchorOrigin={{
-              vertical: "top",
+              vertical: "bottom",
               horizontal: "right",
             }}
             TransitionComponent={Slide}
             style={{
               fontFamily: "Roboto Slab",
-              marginTop: "100px",
               backgroundColor: "white",
               borderLeftColor: "#4caf50",
               borderLeftWidth: "0.382rem",
