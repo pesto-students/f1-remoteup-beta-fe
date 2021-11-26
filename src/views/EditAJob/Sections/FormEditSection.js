@@ -31,6 +31,7 @@ import styles from "assets/jss/material-kit-react/views/landingPageSections/work
 import radioStyles from "assets/jss/material-kit-react/customCheckboxRadioSwitch.js";
 import customSelectStyle from "assets/jss/material-kit-react/customSelectStyle";
 import CustomFileInput from "components/CustomFileInput/CustomFileInput";
+import Progress from "components/Progress/Progress";
 
 import { useFormik, ErrorMessage } from "formik";
 import { FormHelperText } from "@material-ui/core";
@@ -347,7 +348,24 @@ export default function FormEditSection(props) {
   );
 
   if (isLoading) {
-    return "...isLoading";
+    return (
+      <div className={classes.section}>
+        <GridContainer>
+          <GridItem
+            xs={12}
+            sm={12}
+            md={12}
+            style={{
+              minHeight: "700px",
+              paddingTop: "100px",
+              textAlign: "center",
+            }}
+          >
+            <Progress />
+          </GridItem>
+        </GridContainer>
+      </div>
+    );
   }
 
   if (error) {

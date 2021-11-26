@@ -37,6 +37,8 @@ import Button from "components/CustomButtons/Button.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
 import Parallax from "components/Parallax/Parallax.js";
 import NavPills from "components/NavPills/NavPills.js";
+import Loading from "components/Loading/Loading.js";
+import ScrollToTopOnMount from "components/ScrollToTopOnMount/ScrollToTopOnMount.js";
 
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 
@@ -62,14 +64,6 @@ const cardStyles = {
   ...imagesStyles,
   cardTitle,
 };
-
-function ScrollToTopOnMount() {
-  React.useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  return null;
-}
 
 const useStyles = makeStyles(styles);
 const useCardStyles = makeStyles(cardStyles);
@@ -191,18 +185,22 @@ export default function JobDetails(props) {
     if (state.role === "Jobseeker") {
       if (saved.data && !saved.isLoading && !saved.error) {
         const allSaved = [];
-        saved.data.payload.jobData.map((job) => allSaved.push(job._id));
-        if (allSaved.includes(jobId)) {
-          setIsSaved(true);
+        if (saved.data.payload.jobData !== undefined) {
+          saved.data.payload.jobData.map((job) => allSaved.push(job._id));
+          if (allSaved.includes(jobId)) {
+            setIsSaved(true);
+          }
         }
       }
-      if (applied.data) {
+      if (applied.data && !applied.isLoading && !applied.error) {
         const allApplied = [];
-        applied.data.payload.jobData.map((job) => {
-          allApplied.push(job._id);
-        });
-        if (allApplied.includes(jobId)) {
-          setIsApplied(true);
+        if (applied.data.payload.jobData !== undefined) {
+          applied.data.payload.jobData.map((job) => {
+            allApplied.push(job._id);
+          });
+          if (allApplied.includes(jobId)) {
+            setIsApplied(true);
+          }
         }
       }
     }
@@ -246,8 +244,8 @@ export default function JobDetails(props) {
   //   )
   // );
 
-  if (job.isLoading) {
-    return "...isLoading";
+  if (job.isLoading || !job.data) {
+    return <Loading />;
   }
 
   if (job.error) {
