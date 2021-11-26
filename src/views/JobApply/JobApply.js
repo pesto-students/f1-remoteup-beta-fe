@@ -41,6 +41,7 @@ import Parallax from "components/Parallax/Parallax.js";
 import NavPills from "components/NavPills/NavPills.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
 import CustomFileInput from "components/CustomFileInput/CustomFileInput";
+import Loading from "components/Loading/Loading.js";
 
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 
@@ -201,7 +202,7 @@ export default function JobApply(props) {
 
   if (isLoading) {
     console.log("Job Apply isLoading");
-    return "...isLoading";
+    return <Loading />;
   }
 
   if (error) {

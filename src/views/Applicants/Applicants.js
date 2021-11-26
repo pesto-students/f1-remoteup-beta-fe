@@ -46,6 +46,7 @@ import HeaderLinks from "components/Header/HeaderLinks.js";
 import Parallax from "components/Parallax/Parallax.js";
 import Table from "components/Table/Table.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
+import Loading from "components/Loading/Loading.js";
 
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 import tableStyle from "assets/jss/material-kit-react/contentAreas";
@@ -447,17 +448,17 @@ export default function Applicants(props) {
     );
   });
 
-  if (job.isLoading) {
-    return "...isLoading";
+  if (job.isLoading || app.isLoading) {
+    return <Loading />;
   }
 
   if (job.error) {
     return "An error occured " + error.message;
   }
 
-  if (app.isLoading) {
-    return "...isAppLoading";
-  }
+  // if (app.isLoading) {
+  //   return "...isAppLoading";
+  // }
 
   if (app.error) {
     return "An error occured " + appError.message;
