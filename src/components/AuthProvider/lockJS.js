@@ -28,7 +28,7 @@ const lockJS = new Auth0Lock(
       passwordInputPlaceholder: "Password: jobseeker@1234",
       emailInputPlaceholder: "Email: remoteup.jobseeker@gmail.com",
       socialLoginInstructions:
-        "<div>Select Google </div><div>Email: remoteup.jobseeker@gmail.com</div><div>Password: jobseeker@1234</div>",
+        "<strong>Email: remoteup.jobseeker@gmail.com<br/>Password: jobseeker@1234<hr/>Please follow instructions:<br/>1. Copy Email<br/>2. Remember Password<br/>3. Select Google<br/>4. Select Use another account <br/> 5. Paste Email<br/>6. Enter Password</strong>",
       socialSignUpInstructions: "Hello LinkedIn",
     },
     autoclose: true,
