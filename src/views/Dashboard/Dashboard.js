@@ -435,38 +435,77 @@ export default function Dashboard(props) {
               lg={10}
               style={{ marginTop: "18px", textAlign: "left" }}
             >
-              <h3
-                className="roboto-slab"
-                style={{
-                  fontSize: "1.35rem",
-                  fontWeight: "700",
-                  marginTop: "100px",
-                }}
-              >
-                Jobs Posted
-              </h3>
+              {jobs.length > 0 && (
+                <h3
+                  className="roboto-slab"
+                  style={{
+                    fontSize: "1.35rem",
+                    fontWeight: "700",
+                    marginTop: "100px",
+                  }}
+                >
+                  Jobs Posted
+                </h3>
+              )}
             </GridItem>
             <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
             <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
-            <GridItem xs={10} sm={10} md={10} lg={10}>
-              <Table
-                tableHead={[
-                  "#",
-                  "Job Position",
-                  "Category",
-                  "Job Type",
-                  "Date",
-                  "Plan Type",
-                  "Actions",
-                ]}
-                tableData={jobs}
-                tableHeaderColor="warning"
-                hover
-                customCellClasses={[tableClasses.textCenter]}
-                customClassesForCells={[6]}
-                customHeadCellClasses={[tableClasses.textCenter]}
-                customHeadClassesForCells={[6]}
-              />
+            <GridItem
+              xs={10}
+              sm={10}
+              md={10}
+              lg={10}
+              style={{
+                marginTop: "18px",
+                textAlign: "center",
+                minHeight: "500px",
+              }}
+            >
+              {jobs.length === 0 && (
+                <>
+                  <h3
+                    className="roboto-slab"
+                    style={{
+                      fontSize: "1.35rem",
+                      fontWeight: "700",
+                      marginTop: "100px",
+                    }}
+                  >
+                    No Job Posted Yet
+                  </h3>
+                  <Button
+                    component={Link}
+                    round
+                    color="info"
+                    size="lg"
+                    to="/post-a-job"
+                    rel="noopener noreferrer"
+                  >
+                    <SubjectIcon />
+                    <span className="post-a-job">Post a Job</span>
+                  </Button>
+                </>
+              )}
+              {jobs.length > 0 && (
+                <Table
+                  tableHead={[
+                    "#",
+                    "Job Position",
+                    "Category",
+                    "Job Type",
+                    "Date",
+                    "Plan Type",
+                    "Actions",
+                  ]}
+                  tableData={jobs}
+                  tableHeaderColor="warning"
+                  hover
+                  customCellClasses={[tableClasses.textCenter]}
+                  customClassesForCells={[6]}
+                  customHeadCellClasses={[tableClasses.textCenter]}
+                  customHeadClassesForCells={[6]}
+                />
+              )}
             </GridItem>
             <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
           </GridContainer>
