@@ -596,62 +596,86 @@ export default function Applicants(props) {
             </GridItem>
             <GridItem xs={3} sm={3} md={3} lg={3}></GridItem>
             {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
-            <GridItem
-              xs={11}
-              sm={11}
-              md={11}
-              lg={11}
-              style={{ marginTop: "18px", textAlign: "left" }}
-            >
-              <h3
-                className="roboto-slab"
-                style={{
-                  fontSize: "1.35rem",
-                  fontWeight: "700",
-                  paddingTop: "0px",
-                }}
+            {apps.length > 0 && (
+              <GridItem
+                xs={11}
+                sm={11}
+                md={11}
+                lg={11}
+                style={{ marginTop: "18px", textAlign: "left" }}
               >
-                Applicants
-              </h3>
-            </GridItem>
+                <h3
+                  className="roboto-slab"
+                  style={{
+                    fontSize: "1.35rem",
+                    fontWeight: "700",
+                    paddingTop: "0px",
+                  }}
+                >
+                  Applicants
+                </h3>
+              </GridItem>
+            )}
             {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
             {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
+            {apps.length === 0 && (
+              <GridItem
+                xs={11}
+                sm={11}
+                md={11}
+                lg={11}
+                style={{ marginTop: "70px", textAlign: "center" }}
+              >
+                <h3
+                  className="roboto-slab"
+                  style={{
+                    fontSize: "1.35rem",
+                    fontWeight: "700",
+                    paddingTop: "0px",
+                  }}
+                >
+                  No application received yet
+                </h3>
+              </GridItem>
+            )}
             <GridItem xs={11} sm={11} md={11} lg={11}>
-              <Table
-                tableHead={[
-                  "#",
-                  "Name",
-                  "Email",
-                  "Phone",
-                  "Exp.(Yrs.)",
-                  "Submitted",
-                  "Resume",
-                  "Status / Notes",
-                ]}
-                tableData={apps}
-                customCellClasses={[
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                ]}
-                customClassesForCells={[0, 1, 2, 3, 4, 5, 6, 7]}
-                customHeadCellClasses={[
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                  tableClasses.textCenter,
-                ]}
-                customHeadClassesForCells={[0, 1, 2, 3, 4, 5, 6, 7]}
-              />
+              {apps.length > 0 && (
+                <Table
+                  tableHead={[
+                    "#",
+                    "Name",
+                    "Email",
+                    "Phone",
+                    "Exp.(Yrs.)",
+                    "Submitted",
+                    "Resume",
+                    "Status / Notes",
+                  ]}
+                  tableData={apps}
+                  customCellClasses={[
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                  ]}
+                  customClassesForCells={[0, 1, 2, 3, 4, 5, 6, 7]}
+                  customHeadCellClasses={[
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                    tableClasses.textCenter,
+                  ]}
+                  customHeadClassesForCells={[0, 1, 2, 3, 4, 5, 6, 7]}
+                />
+              )}
             </GridItem>
             {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
           </GridContainer>
