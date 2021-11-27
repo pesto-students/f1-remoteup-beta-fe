@@ -105,7 +105,7 @@ function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   if (localStorage.isAuthenticated) {
-    if (new Date().getTime() < localStorage.expiresAt) {
+    if (new Date().getTime() > localStorage.expiresAt) {
       dispatch({ type: "LOGOUT" });
     }
   }
