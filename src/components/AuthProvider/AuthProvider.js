@@ -101,7 +101,14 @@ function AuthProvider({ children }) {
       search: "",
     };
   }
+
   const [state, dispatch] = useReducer(authReducer, initialState);
+
+  if (localStorage.isAuthenticated) {
+    if (new Date().getTime() < localStorage.expiresAt) {
+      dispatch({ type: "LOGOUT" });
+    }
+  }
 
   // lockJS.getUserInfo(state.accessToken, function (error, data) {
   //   if (!error) {
@@ -147,6 +154,7 @@ function AuthProvider({ children }) {
       localStorage.setItem("authResult", JSON.stringify(authResult));
       localStorage.setItem("isAuthenticated", true);
       localStorage.setItem("role", "Recruiter");
+      localStorage.setItem("expiresAt", expiresAt);
       lockRE.getUserInfo(authResult.accessToken, function (error, data) {
         if (!error) {
           // alert("hello " + profile.name);
@@ -156,6 +164,7 @@ function AuthProvider({ children }) {
         }
       });
     });
+
     // When Jobseeker logs in
     lockJS.on("authenticated", function (authResult) {
       dispatch({
@@ -169,6 +178,7 @@ function AuthProvider({ children }) {
       localStorage.setItem("authResult", JSON.stringify(authResult));
       localStorage.setItem("isAuthenticated", true);
       localStorage.setItem("role", "Jobseeker");
+      localStorage.setItem("expiresAt", expiresAt);
       lockJS.getUserInfo(authResult.accessToken, function (error, data) {
         if (!error) {
           // alert("hello " + profile.name);
