@@ -116,6 +116,14 @@ export default function JobsSection(props) {
       <GridContainer justify="center" alignItems="center">
         {/* <GridItem xs={3} sm={3} md={3}></GridItem> */}
         <GridItem xs={8} sm={8} md={8}>
+          {state.category === "All" && jobsCategory.length === 0 && (
+            <h3
+              className={classes.title}
+              style={{ marginBottom: "20px", marginTop: "40px" }}
+            >
+              No match found
+            </h3>
+          )}
           {state.category === "All" &&
             jobsCategory.map((category) => (
               <>
@@ -204,7 +212,15 @@ export default function JobsSection(props) {
                 ))}
               </>
             ))}
-          {state.category !== "All" && (
+          {state.category !== "All" && jobData.length === 0 && (
+            <h3
+              className={classes.title}
+              style={{ marginBottom: "20px", marginTop: "40px" }}
+            >
+              No match found
+            </h3>
+          )}
+          {state.category !== "All" && jobData.length > 0 && (
             <>
               {/* Category Name */}
               <h3
@@ -228,6 +244,7 @@ export default function JobsSection(props) {
                     </Button>
                   </span> */}
               </h3>
+
               {jobData.map((job) => (
                 <RouterLink to={`/job/${job._id}`} key={job._id}>
                   <Card style={{ marginTop: "18px", marginBottom: "15px" }}>
@@ -289,7 +306,6 @@ export default function JobsSection(props) {
               ))}
             </>
           )}
-
           {/* <Card>
             <CardBody>
               <GridContainer
@@ -416,7 +432,6 @@ export default function JobsSection(props) {
               </GridContainer>
             </CardBody>
           </Card> */}
-
           {/* Customer Service */}
           {/* <h3 className={classes.title + " align-left"}>
             Customer Service
