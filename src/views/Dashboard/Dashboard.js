@@ -471,7 +471,7 @@ export default function Dashboard(props) {
                       marginTop: "100px",
                     }}
                   >
-                    No Job Posted Yet
+                    No job posted yet
                   </h3>
                   <Button
                     component={Link}
