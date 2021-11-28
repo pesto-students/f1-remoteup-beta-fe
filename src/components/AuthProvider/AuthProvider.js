@@ -65,68 +65,6 @@ function AuthProvider({ children }) {
 
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  if (localStorage.isAuthenticated) {
-    if (new Date().getTime() > localStorage.expiresAt) {
-      if (localStorage.role === "Recruiter") {
-        lockRE.checkSession({}, function (err, authResult) {
-          if (!err) {
-            // console.log(authResult);
-            dispatch({
-              type: "LOGIN",
-              payload: { ...authResult, role: "Recruiter" },
-            });
-            let expiresAt = JSON.stringify(
-              authResult.expiresIn * 1000 + new Date().getTime()
-            );
-            localStorage.setItem("authResult", JSON.stringify(authResult));
-            localStorage.setItem("expiresAt", expiresAt);
-            lockRE.getUserInfo(authResult.accessToken, function (error, data) {
-              if (!error) {
-                setProfile(data);
-                localStorage.setItem("profile", JSON.stringify(data));
-                console.log(data);
-              } else {
-                console.log(error);
-                dispatch({ type: "LOGOUT" });
-              }
-            });
-          } else {
-            console.log(err);
-            dispatch({ type: "LOGOUT" });
-          }
-        });
-      } else if (localStorage.role === "Jobseeker") {
-        lockJS.checkSession({}, function (err, authResult) {
-          if (!err) {
-            // console.log(authResult);
-            dispatch({
-              type: "LOGIN",
-              payload: { ...authResult, role: "Jobseeker" },
-            });
-            let expiresAt = JSON.stringify(
-              authResult.expiresIn * 1000 + new Date().getTime()
-            );
-            localStorage.setItem("authResult", JSON.stringify(authResult));
-            localStorage.setItem("expiresAt", expiresAt);
-            lockJS.getUserInfo(authResult.accessToken, function (error, data) {
-              if (!error) {
-                setProfile(data);
-                localStorage.setItem("profile", JSON.stringify(data));
-                console.log(data);
-              } else {
-                console.log(error);
-                dispatch({ type: "LOGOUT" });
-              }
-            });
-          } else {
-            console.log(err);
-            dispatch({ type: "LOGOUT" });
-          }
-        });
-      }
-    }
-  }
-
   console.log(state);
   console.log(profile);
   useEffect(() => {
@@ -195,7 +133,7 @@ function AuthProvider({ children }) {
       setProfile({});
     }
   }, [state.isAuthenticated]);
-  const value = { state, dispatch, profile };
+  const value = { state, dispatch, profile, setProfile };
   // NOTE: you *might* need to memoize this value
   // Learn more in http://kcd.im/optimize-context
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -208,4 +146,70 @@ function useAuth() {
   }
   return context;
 }
-export { AuthProvider, useAuth };
+
+function checkJWT(dispatch, setProfile) {
+  if (localStorage.isAuthenticated) {
+    if (new Date().getTime() > localStorage.expiresAt) {
+      if (localStorage.role === "Recruiter") {
+        lockRE.checkSession({}, function (err, authResult) {
+          if (!err) {
+            // console.log(authResult);
+            dispatch({
+              type: "LOGIN",
+              payload: { ...authResult, role: "Recruiter" },
+            });
+            // alert("JWT Updated");
+            let expiresAt = JSON.stringify(
+              authResult.expiresIn * 1000 + new Date().getTime()
+            );
+            localStorage.setItem("authResult", JSON.stringify(authResult));
+            localStorage.setItem("expiresAt", expiresAt);
+            lockRE.getUserInfo(authResult.accessToken, function (error, data) {
+              if (!error) {
+                setProfile(data);
+                localStorage.setItem("profile", JSON.stringify(data));
+                console.log(data);
+              } else {
+                console.log(error);
+                dispatch({ type: "LOGOUT" });
+              }
+            });
+          } else {
+            console.log(err);
+            dispatch({ type: "LOGOUT" });
+          }
+        });
+      } else if (localStorage.role === "Jobseeker") {
+        lockJS.checkSession({}, function (err, authResult) {
+          if (!err) {
+            // console.log(authResult);
+            dispatch({
+              type: "LOGIN",
+              payload: { ...authResult, role: "Jobseeker" },
+            });
+            let expiresAt = JSON.stringify(
+              authResult.expiresIn * 1000 + new Date().getTime()
+            );
+            localStorage.setItem("authResult", JSON.stringify(authResult));
+            localStorage.setItem("expiresAt", expiresAt);
+            lockJS.getUserInfo(authResult.accessToken, function (error, data) {
+              if (!error) {
+                setProfile(data);
+                localStorage.setItem("profile", JSON.stringify(data));
+                console.log(data);
+              } else {
+                console.log(error);
+                dispatch({ type: "LOGOUT" });
+              }
+            });
+          } else {
+            console.log(err);
+            dispatch({ type: "LOGOUT" });
+          }
+        });
+      }
+    }
+  }
+}
+
+export { AuthProvider, useAuth, checkJWT };
