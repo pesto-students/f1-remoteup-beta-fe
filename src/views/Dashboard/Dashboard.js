@@ -47,7 +47,7 @@ import modalStyle from "assets/jss/material-kit-react/modalStyle.js";
 import ProductSection from "../LandingPage/Sections/ProductSection.js";
 import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
-import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useAuth, checkJWT } from "components/AuthProvider/AuthProvider.js";
 import { useQuery, useMutation } from "react-query";
 import moment from "moment";
 import { useSnackbar } from "notistack";
@@ -213,15 +213,20 @@ export default function Dashboard(props) {
   const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles();
   const tableClasses = useTableStyles();
-  const { state } = useAuth();
+  const { state, dispatch, setProfile } = useAuth();
   const { ...rest } = props;
 
-  const { isLoading, error, data } = useQuery("dashboard", () =>
-    fetch(`${process.env.REACT_APP_SERVER_URL}/recruiter/job/viewjobs`, {
-      headers: new Headers({
-        Authorization: `Bearer ${state.accessToken}`,
-      }),
-    }).then((res) => res.json())
+  checkJWT(dispatch, setProfile);
+
+  const { isIdle, isLoading, error, data } = useQuery(
+    "dashboard",
+    () =>
+      fetch(`${process.env.REACT_APP_SERVER_URL}/recruiter/job/viewjobs`, {
+        headers: new Headers({
+          Authorization: `Bearer ${state.accessToken}`,
+        }),
+      }).then((res) => res.json()),
+    { enabled: new Date().getTime() < localStorage.expiresAt }
   );
 
   const jobs = [];
@@ -238,7 +243,11 @@ export default function Dashboard(props) {
     );
   });
 
-  if (isLoading) {
+  if (new Date().getTime() > localStorage.expiresAt) {
+    return <Loading />;
+  }
+
+  if (isLoading || isIdle) {
     return <Loading />;
   }
 
@@ -246,7 +255,7 @@ export default function Dashboard(props) {
     return "An error occured " + error.message;
   }
 
-  if (data) {
+  if (data.payload.jobData !== undefined) {
     data.payload.jobData.map((job, index) =>
       jobs.push([
         index + 1,

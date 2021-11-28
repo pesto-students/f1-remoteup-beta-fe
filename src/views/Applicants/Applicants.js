@@ -57,7 +57,7 @@ import customSelectStyle from "assets/jss/material-kit-react/customSelectStyle";
 import ProductSection from "../LandingPage/Sections/ProductSection.js";
 import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
-import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useAuth, checkJWT } from "components/AuthProvider/AuthProvider.js";
 import { useQuery, useQueries, useMutation } from "react-query";
 
 import moment from "moment";
@@ -398,8 +398,10 @@ export default function Applicants(props) {
   const jobId = props.match.params.jobId;
   const classes = useStyles();
   const tableClasses = useTableStyles();
-  const { state } = useAuth();
+  const { state, dispatch, setProfile } = useAuth();
   const { ...rest } = props;
+
+  checkJWT(dispatch, setProfile);
 
   const queries = useQueries([
     {
@@ -422,6 +424,7 @@ export default function Applicants(props) {
           }
         ).then((res) => res.json());
       },
+      enabled: new Date().getTime() < localStorage.expiresAt,
     },
   ]);
   const [job, app] = queries;
@@ -448,7 +451,12 @@ export default function Applicants(props) {
     );
   });
 
-  if (job.isLoading || app.isLoading) {
+  if (
+    job.isLoading ||
+    app.isLoading ||
+    app.isIdle ||
+    app.data.payload.applications === undefined
+  ) {
     return <Loading />;
   }
 
