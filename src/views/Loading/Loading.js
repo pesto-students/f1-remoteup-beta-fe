@@ -8,6 +8,8 @@ import GridContainer from "components/Grid/GridContainer";
 import GridItem from "components/Grid/GridItem";
 import HeaderLinks from "components/Header/HeaderLinks";
 import ScrollToTopOnMount from "components/ScrollToTopOnMount/ScrollToTopOnMount";
+import Footer from "components/Footer/Footer";
+
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 
 const useStyles = makeStyles(styles);
@@ -46,6 +48,7 @@ export default function Loading(props) {
           </GridContainer>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

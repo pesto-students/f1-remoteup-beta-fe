@@ -46,7 +46,7 @@ import HeaderLinks from "components/Header/HeaderLinks.js";
 import Parallax from "components/Parallax/Parallax.js";
 import Table from "components/Table/Table.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
-import Loading from "components/Loading/Loading.js";
+import Loading from "views/Loading/Loading.js";
 
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 import tableStyle from "assets/jss/material-kit-react/contentAreas";

@@ -37,8 +37,9 @@ import Button from "components/CustomButtons/Button.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
 import Parallax from "components/Parallax/Parallax.js";
 import NavPills from "components/NavPills/NavPills.js";
-import Loading from "components/Loading/Loading.js";
 import ScrollToTopOnMount from "components/ScrollToTopOnMount/ScrollToTopOnMount.js";
+
+import Loading from "views/Loading/Loading.js";
 
 import styles from "assets/jss/material-kit-react/views/landingPage.js";
 
