@@ -42,45 +42,6 @@ function authReducer(state, action) {
 }
 
 function AuthProvider({ children }) {
-  // if (localStorage.isAuthenticated) {
-  //   if (localStorage.role === "Recruiter") {
-  //     lockRE.checkSession({}, function (err, authResult) {
-  //       if (!err) {
-  //         console.log(authResult);
-  //         // dispatch({ type: "RESUME", role: "Recruiter", ...authResult });
-  //         lockRE.getUserInfo(authResult.accessToken, function (error, data) {
-  //           if (!error) {
-  //             setProfile(data);
-  //             console.log(data);
-  //           } else {
-  //             console.log(error);
-  //           }
-  //         });
-  //       } else {
-  //         console.log(err);
-  //         // dispatch({ type: "LOGOUT" });
-  //       }
-  //     });
-  //   } else if (localStorage.role === "Jobseeker") {
-  //     lockJS.checkSession({}, function (err, authResult) {
-  //       if (!err) {
-  //         console.log(authResult);
-  //         // dispatch({ type: "RESUME", role: "Jobseeker", ...authResult });
-  //         lockJS.getUserInfo(authResult.accessToken, function (error, data) {
-  //           if (!error) {
-  //             setProfile(data);
-  //             console.log(data);
-  //           } else {
-  //             console.log(error);
-  //           }
-  //         });
-  //       } else {
-  //         console.log(err);
-  //         // dispatch({ type: "LOGOUT" });
-  //       }
-  //     });
-  //   }
-  // }
   let initialState;
   const [profile, setProfile] = useState(
     JSON.parse(localStorage.getItem("profile")) || {}
@@ -106,26 +67,65 @@ function AuthProvider({ children }) {
 
   if (localStorage.isAuthenticated) {
     if (new Date().getTime() > localStorage.expiresAt) {
-      dispatch({ type: "LOGOUT" });
+      if (localStorage.role === "Recruiter") {
+        lockRE.checkSession({}, function (err, authResult) {
+          if (!err) {
+            // console.log(authResult);
+            dispatch({
+              type: "LOGIN",
+              payload: { ...authResult, role: "Recruiter" },
+            });
+            let expiresAt = JSON.stringify(
+              authResult.expiresIn * 1000 + new Date().getTime()
+            );
+            localStorage.setItem("authResult", JSON.stringify(authResult));
+            localStorage.setItem("expiresAt", expiresAt);
+            lockRE.getUserInfo(authResult.accessToken, function (error, data) {
+              if (!error) {
+                setProfile(data);
+                localStorage.setItem("profile", JSON.stringify(data));
+                console.log(data);
+              } else {
+                console.log(error);
+                dispatch({ type: "LOGOUT" });
+              }
+            });
+          } else {
+            console.log(err);
+            dispatch({ type: "LOGOUT" });
+          }
+        });
+      } else if (localStorage.role === "Jobseeker") {
+        lockJS.checkSession({}, function (err, authResult) {
+          if (!err) {
+            // console.log(authResult);
+            dispatch({
+              type: "LOGIN",
+              payload: { ...authResult, role: "Jobseeker" },
+            });
+            let expiresAt = JSON.stringify(
+              authResult.expiresIn * 1000 + new Date().getTime()
+            );
+            localStorage.setItem("authResult", JSON.stringify(authResult));
+            localStorage.setItem("expiresAt", expiresAt);
+            lockJS.getUserInfo(authResult.accessToken, function (error, data) {
+              if (!error) {
+                setProfile(data);
+                localStorage.setItem("profile", JSON.stringify(data));
+                console.log(data);
+              } else {
+                console.log(error);
+                dispatch({ type: "LOGOUT" });
+              }
+            });
+          } else {
+            console.log(err);
+            dispatch({ type: "LOGOUT" });
+          }
+        });
+      }
     }
   }
-
-  // lockJS.getUserInfo(state.accessToken, function (error, data) {
-  //   if (!error) {
-  //     // alert("hello " + profile.name);
-  //     setProfile(data);
-  //     console.log(data);
-  //   }
-  // });
-  // } else if (state.role === "Recruiter") {
-  //   lockRE.getUserInfo(state.accessToken, function (error, data) {
-  //     if (!error) {
-  //       // alert("hello " + profile.name);
-  //       setProfile(data);
-  //       console.log(data);
-  //     }
-  //   });
-  // }
 
   console.log(state);
   console.log(profile);
