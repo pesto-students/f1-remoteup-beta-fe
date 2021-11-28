@@ -22,7 +22,7 @@ import CardBody from "components/Card/CardBody.js";
 
 // core components
 import Header from "components/Header/Header.js";
-import RFooter from "components/Footer/RFooter.js";
+import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
@@ -381,7 +381,7 @@ export default function Jobs(props) {
           </GridContainer>
         </div>
       </div>
-      <RFooter />
+      <Footer />
     </div>
   ) : (
     <Redirect to="/" from="/" push exact strict />
