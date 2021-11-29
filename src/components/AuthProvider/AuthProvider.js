@@ -19,6 +19,7 @@ function authReducer(state, action) {
       localStorage.removeItem("isAuthenticated");
       localStorage.removeItem("role");
       localStorage.removeItem("profile");
+      localStorage.removeItem("expiresAt");
       return {
         isAuthenticated: false,
         role: "undefined",
