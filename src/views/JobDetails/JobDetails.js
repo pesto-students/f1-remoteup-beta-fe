@@ -254,11 +254,7 @@ export default function JobDetails(props) {
   //   )
   // );
 
-  if (
-    job.isLoading ||
-    !job.data ||
-    new Date().getTime() > localStorage.expiresAt
-  ) {
+  if (job.isLoading || !job.data) {
     return <Loading />;
   }
 
