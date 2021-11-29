@@ -60,7 +60,7 @@ import { useFormik, ErrorMessage } from "formik";
 import { FormHelperText } from "@material-ui/core";
 import * as yup from "yup";
 
-import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useAuth, checkJWT } from "components/AuthProvider/AuthProvider.js";
 
 import { useQuery, useMutation } from "react-query";
 import { useSnackbar } from "notistack";
@@ -130,9 +130,11 @@ export default function JobApply(props) {
   const cardClasses = useCardStyles();
   const typoClasses = useTypoStyles();
   const workClasses = useWorkStyles();
-  const { state } = useAuth();
+  const { state, dispatch, setProfile } = useAuth();
   const { ...rest } = props;
   const { enqueueSnackbar } = useSnackbar();
+  checkJWT(dispatch, setProfile);
+
   const mutation = useMutation(
     (newApp) =>
       // axios.post(
@@ -201,7 +203,7 @@ export default function JobApply(props) {
     ).then((res) => res.json())
   );
 
-  if (isLoading) {
+  if (isLoading || new Date().getTime() > localStorage.expiresAt) {
     console.log("Job Apply isLoading");
     return <Loading />;
   }

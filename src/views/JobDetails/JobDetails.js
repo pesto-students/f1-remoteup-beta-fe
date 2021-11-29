@@ -54,7 +54,7 @@ import ProductSection from "../LandingPage/Sections/ProductSection.js";
 import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 
-import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useAuth, checkJWT } from "components/AuthProvider/AuthProvider.js";
 import { lockJS } from "components/AuthProvider/lockJS";
 import { useQuery, useQueries, useMutation } from "react-query";
 import { useSnackbar } from "notistack";
@@ -77,10 +77,12 @@ export default function JobDetails(props) {
   const cardClasses = useCardStyles();
   const typoClasses = useTypoStyles();
 
-  const { state } = useAuth();
+  const { state, dispatch, setProfile } = useAuth();
   const { ...rest } = props;
   const [isApplied, setIsApplied] = React.useState(false);
   const [isSaved, setIsSaved] = React.useState(false);
+
+  checkJWT(dispatch, setProfile);
 
   console.log(state.isAuthenticated);
 
@@ -148,6 +150,7 @@ export default function JobDetails(props) {
           }
         ).then((res) => res.json());
       },
+      enabled: new Date().getTime() < localStorage.expiresAt,
       // onSuccess: (result, variables, context) => {
       //   const allSaved = [];
       //   saved.data.payload.jobData.map((job) => allSaved.push(job._id));
@@ -168,6 +171,7 @@ export default function JobDetails(props) {
           }
         ).then((res) => res.json());
       },
+      enabled: new Date().getTime() < localStorage.expiresAt,
       // onSuccess: (result, variables, context) => {
       //   const allApplied = [];
       //   applied.data.payload.jobData.map((job) => {
@@ -184,7 +188,7 @@ export default function JobDetails(props) {
 
   React.useEffect(() => {
     if (state.role === "Jobseeker") {
-      if (saved.data && !saved.isLoading && !saved.error) {
+      if (saved.data && !saved.isLoading && !saved.error && !saved.isIdle) {
         const allSaved = [];
         if (saved.data.payload.jobData !== undefined) {
           saved.data.payload.jobData.map((job) => allSaved.push(job._id));
@@ -193,7 +197,12 @@ export default function JobDetails(props) {
           }
         }
       }
-      if (applied.data && !applied.isLoading && !applied.error) {
+      if (
+        applied.data &&
+        !applied.isLoading &&
+        !applied.error &&
+        !applied.isIdle
+      ) {
         const allApplied = [];
         if (applied.data.payload.jobData !== undefined) {
           applied.data.payload.jobData.map((job) => {
@@ -245,7 +254,11 @@ export default function JobDetails(props) {
   //   )
   // );
 
-  if (job.isLoading || !job.data) {
+  if (
+    job.isLoading ||
+    !job.data ||
+    new Date().getTime() > localStorage.expiresAt
+  ) {
     return <Loading />;
   }
 

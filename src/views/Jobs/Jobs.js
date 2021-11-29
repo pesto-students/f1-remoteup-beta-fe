@@ -46,7 +46,7 @@ import ProductSection from "../LandingPage/Sections/ProductSection.js";
 import TeamSection from "../LandingPage/Sections/TeamSection.js";
 import WorkSection from "../LandingPage/Sections/WorkSection.js";
 
-import { useAuth } from "components/AuthProvider/AuthProvider.js";
+import { useAuth, checkJWT } from "components/AuthProvider/AuthProvider.js";
 import { useQueries } from "react-query";
 import moment from "moment";
 
@@ -65,9 +65,12 @@ export default function Jobs(props) {
   const classes = useStyles();
   const cardClasses = useCardStyles();
   const typoClasses = useTypoStyles();
-  const { state } = useAuth();
+  const { state, dispatch, setProfile } = useAuth();
   const { ...rest } = props;
   console.log(state.isAuthenticated);
+
+  checkJWT(dispatch, setProfile);
+
   const queries = useQueries([
     {
       queryKey: `savedjobs`,
@@ -81,6 +84,7 @@ export default function Jobs(props) {
           }
         ).then((res) => res.json());
       },
+      enabled: new Date().getTime() < localStorage.expiresAt,
     },
     {
       queryKey: `appliedjobs`,
@@ -94,11 +98,12 @@ export default function Jobs(props) {
           }
         ).then((res) => res.json());
       },
+      enabled: new Date().getTime() < localStorage.expiresAt,
     },
   ]);
   const [saved, applied] = queries;
 
-  if (saved.isLoading || applied.isLoading) {
+  if (saved.isLoading || applied.isLoading || saved.isIdle || applied.isIdle) {
     return <Loading />;
   }
   if (
@@ -111,6 +116,7 @@ export default function Jobs(props) {
   ) {
     return <Loading />;
   }
+
   if (saved.error || applied.error) {
     return "An error occured " + error.message;
   }
