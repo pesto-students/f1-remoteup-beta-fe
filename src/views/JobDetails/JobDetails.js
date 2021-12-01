@@ -81,6 +81,7 @@ export default function JobDetails(props) {
   const { ...rest } = props;
   const [isApplied, setIsApplied] = React.useState(false);
   const [isSaved, setIsSaved] = React.useState(false);
+  const [updated, setUpdated] = React.useState(false);
 
   checkJWT(dispatch, setProfile);
 
@@ -139,31 +140,10 @@ export default function JobDetails(props) {
         ).then((res) => res.json()),
     },
     {
-      queryKey: `savedjobs`,
+      queryKey: `savedAppliedJobsList`,
       queryFn: () => {
         return fetch(
-          `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewsavedjobs`,
-          {
-            headers: new Headers({
-              Authorization: `Bearer ${state.accessToken}`,
-            }),
-          }
-        ).then((res) => res.json());
-      },
-      enabled: new Date().getTime() < localStorage.expiresAt,
-      // onSuccess: (result, variables, context) => {
-      //   const allSaved = [];
-      //   saved.data.payload.jobData.map((job) => allSaved.push(job._id));
-      //   if (allSaved.includes(jobId)) {
-      //     setIsSaved(true);
-      //   }
-      // },
-    },
-    {
-      queryKey: `appliedjobs`,
-      queryFn: () => {
-        return fetch(
-          `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewappliedjobs`,
+          `${process.env.REACT_APP_SERVER_URL}/jobseeker/job/savedappliedjobslist`,
           {
             headers: new Headers({
               Authorization: `Bearer ${state.accessToken}`,
@@ -174,7 +154,7 @@ export default function JobDetails(props) {
       enabled: new Date().getTime() < localStorage.expiresAt,
       // onSuccess: (result, variables, context) => {
       //   const allApplied = [];
-      //   applied.data.payload.jobData.map((job) => {
+      //   savedAppliedList.data.payload.jobData.map((job) => {
       //     allApplied.push(job._id);
       //   });
       //   if (allApplied.includes(jobId)) {
@@ -184,37 +164,28 @@ export default function JobDetails(props) {
     },
   ]);
 
-  const [job, saved, applied] = queries;
+  const [job, savedAppliedList] = queries;
 
   React.useEffect(() => {
     if (state.role === "Jobseeker") {
-      if (saved.data && !saved.isLoading && !saved.error && !saved.isIdle) {
-        const allSaved = [];
-        if (saved.data.payload.jobData !== undefined) {
-          saved.data.payload.jobData.map((job) => allSaved.push(job._id));
-          if (allSaved.includes(jobId)) {
-            setIsSaved(true);
-          }
-        }
-      }
       if (
-        applied.data &&
-        !applied.isLoading &&
-        !applied.error &&
-        !applied.isIdle
+        savedAppliedList.data &&
+        !savedAppliedList.isLoading &&
+        !savedAppliedList.error &&
+        !savedAppliedList.isIdle
       ) {
-        const allApplied = [];
-        if (applied.data.payload.jobData !== undefined) {
-          applied.data.payload.jobData.map((job) => {
-            allApplied.push(job._id);
-          });
-          if (allApplied.includes(jobId)) {
-            setIsApplied(true);
-          }
+        const allApplied = savedAppliedList.data.payload.appliedJobs;
+        const allSaved = savedAppliedList.data.payload.savedJobs;
+        if (allApplied.includes(jobId)) {
+          setIsApplied(true);
         }
+        if (allSaved.includes(jobId)) {
+          setIsSaved(true);
+        }
+        setUpdated(true);
       }
     }
-  }, [applied.data, saved.data]);
+  }, [savedAppliedList.data]);
 
   const mutation = useMutation(
     () => {
@@ -253,6 +224,10 @@ export default function JobDetails(props) {
   //     res.json()
   //   )
   // );
+
+  if (state.role === "Jobseeker" && !updated) {
+    return <Loading />;
+  }
 
   if (job.isLoading || !job.data) {
     return <Loading />;
