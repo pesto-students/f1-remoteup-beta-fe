@@ -290,7 +290,7 @@ export default function FormEditSection(props) {
     `edit-${jobId}`,
     () =>
       fetch(
-        `${process.env.REACT_APP_SERVER_URL}/public/job/viewjob/${jobId}`
+        `${process.env.REACT_APP_SERVER_URL}/public/job/editjob/${jobId}`
       ).then((res) => res.json()),
     {
       cacheTime: 30000000,
