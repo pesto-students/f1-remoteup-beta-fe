@@ -16,6 +16,7 @@ import Edit from "@material-ui/icons/Edit";
 import Close from "@material-ui/icons/Close";
 import Done from "@material-ui/icons/Done";
 import Launch from "@material-ui/icons/Launch";
+import Visibility from "@material-ui/icons/Visibility";
 
 import Slide from "@material-ui/core/Slide";
 import Dialog from "@material-ui/core/Dialog";
@@ -180,6 +181,16 @@ function DeleteModal(props) {
 function Actions(props) {
   return (
     <>
+      {/* <Button
+        component={Link}
+        to={`/job/${props.id}`}
+        target="_blank"
+        justIcon
+        size="sm"
+        color="info"
+      >
+        <Visibility />
+      </Button> */}
       {props.applyType === "ATS" && (
         <Button
           component={Link}
@@ -261,7 +272,7 @@ export default function Dashboard(props) {
         index + 1,
         <>
           {job.position}
-          {/* <Button
+          <Button
             component={Link}
             to={`/job/${job._id}`}
             target="_blank"
@@ -270,7 +281,7 @@ export default function Dashboard(props) {
             color="transparent"
           >
             <Launch />
-          </Button> */}
+          </Button>
         </>,
         job.category,
         job.jobType,
@@ -278,6 +289,7 @@ export default function Dashboard(props) {
           " " +
           moment(job.createdAt).format("DD"),
         job.planType,
+        job.applyType === "ATS" ? job.applications.length : "-",
         <Actions applyType={job.applyType} id={job._id} />,
       ])
     );
@@ -320,7 +332,7 @@ export default function Dashboard(props) {
               paddingTop: "100px",
               paddingBottom: "130px",
             }}
-            justify="start"
+            justify="center"
             alignItems="center"
           >
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
@@ -436,12 +448,12 @@ export default function Dashboard(props) {
               <h5 className="roboto-slab">(Last 30 Days)</h5>
             </GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
-            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
+            {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
             <GridItem
-              xs={10}
-              sm={10}
-              md={10}
-              lg={10}
+              xs={11}
+              sm={11}
+              md={11}
+              lg={11}
               style={{ marginTop: "18px", textAlign: "left" }}
             >
               {jobs.length > 0 && (
@@ -457,45 +469,54 @@ export default function Dashboard(props) {
                 </h3>
               )}
             </GridItem>
-            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
-            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
-            <GridItem
-              xs={10}
-              sm={10}
-              md={10}
-              lg={10}
-              style={{
-                marginTop: "18px",
-                textAlign: "center",
-                minHeight: "500px",
-              }}
-            >
-              {jobs.length === 0 && (
-                <>
-                  <h3
-                    className="roboto-slab"
-                    style={{
-                      fontSize: "1.35rem",
-                      fontWeight: "700",
-                      marginTop: "100px",
-                    }}
-                  >
-                    No job posted yet
-                  </h3>
-                  <Button
-                    component={Link}
-                    round
-                    color="info"
-                    size="lg"
-                    to="/post-a-job"
-                    rel="noopener noreferrer"
-                  >
-                    <SubjectIcon />
-                    <span className="post-a-job">Post a Job</span>
-                  </Button>
-                </>
-              )}
-              {jobs.length > 0 && (
+            {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
+            {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
+            {jobs.length === 0 && (
+              <GridItem
+                xs={11}
+                sm={11}
+                md={11}
+                lg={11}
+                style={{
+                  marginTop: "18px",
+                  textAlign: "center",
+                  minHeight: "500px",
+                }}
+              >
+                <h3
+                  className="roboto-slab"
+                  style={{
+                    fontSize: "1.35rem",
+                    fontWeight: "700",
+                    marginTop: "100px",
+                  }}
+                >
+                  No job posted yet
+                </h3>
+                <Button
+                  component={Link}
+                  round
+                  color="info"
+                  size="lg"
+                  to="/post-a-job"
+                  rel="noopener noreferrer"
+                >
+                  <SubjectIcon />
+                  <span className="post-a-job">Post a Job</span>
+                </Button>
+              </GridItem>
+            )}
+            {jobs.length > 0 && (
+              <GridItem
+                xs={11}
+                sm={11}
+                md={11}
+                lg={11}
+                style={{
+                  textAlign: "center",
+                  minHeight: "500px",
+                }}
+              >
                 <Table
                   tableHead={[
                     "#",
@@ -504,6 +525,7 @@ export default function Dashboard(props) {
                     "Job Type",
                     "Date",
                     "Plan Type",
+                    "Applicants",
                     "Actions",
                   ]}
                   tableData={jobs}
@@ -514,9 +536,9 @@ export default function Dashboard(props) {
                   customHeadCellClasses={[tableClasses.textCenter]}
                   customHeadClassesForCells={[6]}
                 />
-              )}
-            </GridItem>
-            <GridItem xs={1} sm={1} md={1} lg={1}></GridItem>
+              </GridItem>
+            )}
+            {/* <GridItem xs={1} sm={1} md={1} lg={1}></GridItem> */}
           </GridContainer>
         </div>
       </div>

@@ -610,7 +610,7 @@ export default function Applicants(props) {
                 sm={11}
                 md={11}
                 lg={11}
-                style={{ marginTop: "18px", textAlign: "left" }}
+                style={{ marginTop: "45px", textAlign: "left" }}
               >
                 <h3
                   className="roboto-slab"
