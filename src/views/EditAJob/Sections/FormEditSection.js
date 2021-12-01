@@ -302,13 +302,13 @@ export default function FormEditSection(props) {
         formik.values.applyType = data.payload.jobData.applyType;
         formik.values.applyValue = data.payload.jobData.applyValue;
         formik.values.candidateRegion = data.payload.jobData.candidateRegion;
-        const jobBlocksFromHTML = convertFromHTML(
-          data.payload.jobData.jobDescription
-        );
-        const jobState = ContentState.createFromBlockArray(
-          jobBlocksFromHTML.contentBlocks,
-          jobBlocksFromHTML.entityMap
-        );
+        // const jobBlocksFromHTML = convertFromHTML(
+        //   data.payload.jobData.jobDescription
+        // );
+        // const jobState = ContentState.createFromBlockArray(
+        //   jobBlocksFromHTML.contentBlocks,
+        //   jobBlocksFromHTML.entityMap
+        // );
         if (!data.payload.jobData.jobDescriptionState["entityMap"]) {
           data.payload.jobData.jobDescriptionState["entityMap"] = {};
         }
@@ -325,13 +325,13 @@ export default function FormEditSection(props) {
         setLogo(data.payload.jobData.logoFile);
         formik.values.companyWebsite = data.payload.jobData.companyWebsite;
         formik.values.companyTagLine = data.payload.jobData.companyTagLine;
-        const companyBlocksFromHTML = convertFromHTML(
-          data.payload.jobData.companyDescription
-        );
-        const companyState = ContentState.createFromBlockArray(
-          companyBlocksFromHTML.contentBlocks,
-          companyBlocksFromHTML.entityMap
-        );
+        // const companyBlocksFromHTML = convertFromHTML(
+        //   data.payload.jobData.companyDescription
+        // );
+        // const companyState = ContentState.createFromBlockArray(
+        //   companyBlocksFromHTML.contentBlocks,
+        //   companyBlocksFromHTML.entityMap
+        // );
         if (!data.payload.jobData.companyDescriptionState["entityMap"]) {
           data.payload.jobData.companyDescriptionState["entityMap"] = {};
         }
