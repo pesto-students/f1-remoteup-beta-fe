@@ -1,32 +1,23 @@
 import React from "react";
-import { Redirect, Link } from "react-router-dom";
-// nodejs library that concatenates classes
+import { Link } from "react-router-dom";
+
+// libraries
 import classNames from "classnames";
+import { useSnackbar } from "notistack";
+
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 
 // @material-ui/icons
-import SubjectIcon from "@mui/icons-material/Subject";
-import Dashboard from "@material-ui/icons/Dashboard";
 import Schedule from "@material-ui/icons/Schedule";
-import List from "@material-ui/icons/List";
 import BookmarkBorder from "@material-ui/icons/BookmarkBorder";
 import Done from "@material-ui/icons/DoneRounded";
-import CheckCircle from "@material-ui/icons/CheckCircleOutlineRounded";
-import World from "@material-ui/icons/Public";
-import Bookmark from "@material-ui/icons/Bookmark";
 import Category from "@material-ui/icons/Category";
 import MailOutline from "@material-ui/icons/MailOutline";
-import Mail from "@material-ui/icons/Mail";
-import Send from "@material-ui/icons/Send";
 
+// icons from ion icons package
 import Money from "assets/img/cash-outline.svg";
 import Earth from "assets/img/earth.svg";
-import Locate from "assets/img/locate.svg";
-// import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-
-import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
 
 // core components
 import Header from "components/Header/Header.js";
@@ -35,29 +26,19 @@ import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
-import Parallax from "components/Parallax/Parallax.js";
-import NavPills from "components/NavPills/NavPills.js";
 import ScrollToTopOnMount from "components/ScrollToTopOnMount/ScrollToTopOnMount.js";
-
-import Loading from "views/Loading/Loading.js";
-
-import styles from "assets/jss/material-kit-react/views/landingPage.js";
-
-import { cardTitle } from "assets/jss/material-kit-react.js";
-import imagesStyles from "assets/jss/material-kit-react/imagesStyles.js";
-import typoStyles from "assets/jss/material-kit-react/views/componentsSections/typographyStyle.js";
-
-import image from "assets/img/faces/avatar.jpg";
-
-// Sections for this page
-import ProductSection from "../LandingPage/Sections/ProductSection.js";
-import TeamSection from "../LandingPage/Sections/TeamSection.js";
-import WorkSection from "../LandingPage/Sections/WorkSection.js";
-
 import { useAuth, checkJWT } from "components/AuthProvider/AuthProvider.js";
 import { lockJS } from "components/AuthProvider/lockJS";
 import { useQuery, useQueries, useMutation } from "react-query";
-import { useSnackbar } from "notistack";
+
+// loading view
+import Loading from "views/Loading/Loading.js";
+
+// styles
+import styles from "assets/jss/material-kit-react/views/landingPage.js";
+import { cardTitle } from "assets/jss/material-kit-react.js";
+import imagesStyles from "assets/jss/material-kit-react/imagesStyles.js";
+import typoStyles from "assets/jss/material-kit-react/views/componentsSections/typographyStyle.js";
 
 const dashboardRoutes = [];
 
@@ -87,50 +68,6 @@ export default function JobDetails(props) {
 
   console.log(state.isAuthenticated);
 
-  // const applied = useQuery(
-  //   `applied-${jobId}`,
-  //   () => {
-  //     return fetch(`${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewappliedjobs`, {
-  //       headers: new Headers({
-  //         Authorization: `Bearer ${state.accessToken}`,
-  //       }),
-  //     }).then((res) => res.json());
-  //   },
-  //   {
-  //     onSuccess: (result, variables, context) => {
-  //       const allSaved = [];
-  //       result.data.payload.jobData.map((job) => allSaved.push(job._id));
-  //       if (allSaved.includes(jobId)) {
-  //         setIsSaved(true);
-  //       }
-  //     },
-  //     onError: (error, variables, context) => alert(error),
-  //     // enabled: state.role === "Jobseeker",
-  //   }
-  // );
-
-  // const saved = useQuery(
-  //   `saved-${jobId}`,
-  //   () => {
-  //     return fetch(`${process.env.REACT_APP_SERVER_URL}/jobseeker/job/viewsavedjobs`, {
-  //       headers: new Headers({
-  //         Authorization: `Bearer ${state.accessToken}`,
-  //       }),
-  //     }).then((res) => res.json());
-  //   },
-  //   {
-  //     onSuccess: (result, variables, context) => {
-  //       const allSaved = [];
-  //       result.data.payload.jobData.map((job) => allSaved.push(job._id));
-  //       if (allSaved.includes(jobId)) {
-  //         setIsSaved(true);
-  //       }
-  //     },
-  //     onError: (error, variables, context) => alert(error),
-  //     // enabled: state.role === "Jobseeker",
-  //   }
-  // );
-
   const queries = useQueries([
     {
       queryKey: `job-${jobId}`,
@@ -152,15 +89,6 @@ export default function JobDetails(props) {
         ).then((res) => res.json());
       },
       enabled: new Date().getTime() < localStorage.expiresAt,
-      // onSuccess: (result, variables, context) => {
-      //   const allApplied = [];
-      //   savedAppliedList.data.payload.jobData.map((job) => {
-      //     allApplied.push(job._id);
-      //   });
-      //   if (allApplied.includes(jobId)) {
-      //     setIsApplied(true);
-      //   }
-      // },
     },
   ]);
 
@@ -169,20 +97,26 @@ export default function JobDetails(props) {
   React.useEffect(() => {
     if (state.role === "Jobseeker") {
       if (
-        savedAppliedList.data &&
+        savedAppliedList.data !== undefined &&
         !savedAppliedList.isLoading &&
         !savedAppliedList.error &&
-        !savedAppliedList.isIdle
+        !savedAppliedList.isIdle &&
+        savedAppliedList.data.payload !== undefined
       ) {
-        const allApplied = savedAppliedList.data.payload.appliedJobs;
-        const allSaved = savedAppliedList.data.payload.savedJobs;
-        if (allApplied.includes(jobId)) {
-          setIsApplied(true);
+        if (
+          savedAppliedList.data.payload.appliedJobs !== undefined &&
+          savedAppliedList.data.payload.savedJobs !== undefined
+        ) {
+          const allApplied = savedAppliedList.data.payload.appliedJobs;
+          const allSaved = savedAppliedList.data.payload.savedJobs;
+          if (allApplied.includes(jobId)) {
+            setIsApplied(true);
+          }
+          if (allSaved.includes(jobId)) {
+            setIsSaved(true);
+          }
+          setUpdated(true);
         }
-        if (allSaved.includes(jobId)) {
-          setIsSaved(true);
-        }
-        setUpdated(true);
       }
     }
   }, [savedAppliedList.data]);
@@ -216,14 +150,6 @@ export default function JobDetails(props) {
       },
     }
   );
-
-  // React.useEffect(() => console.log("."), [isApplied, isSaved]);
-
-  // const { isLoading, error, data } = useQuery(`job-${jobId}`, () =>
-  //   fetch(`${process.env.REACT_APP_SERVER_URL}/public/job/viewjob/${jobId}`).then((res) =>
-  //     res.json()
-  //   )
-  // );
 
   if (state.role === "Jobseeker" && !updated) {
     return <Loading />;
@@ -331,7 +257,6 @@ export default function JobDetails(props) {
                       "invert(29%) sepia(15%) saturate(700%) hue-rotate(174deg) brightness(91%) contrast(97%)",
                   }}
                 />
-                {/* <World style={{ verticalAlign: "middle" }} /> */}
                 <span style={{ verticalAlign: "middle" }}>
                   {" "}
                   {data.payload.jobData.candidateRegion ||
@@ -446,16 +371,6 @@ export default function JobDetails(props) {
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
             <GridItem xs={2} sm={2} md={2} lg={2}></GridItem>
             <GridItem xs={8} sm={8} md={8} lg={8}>
-              {/* <h4
-                className="roboto-slab"
-                style={{
-                  fontSize: "1.27rem",
-                  fontWeight: "700",
-                  paddingTop: "30px",
-                }}
-              >
-                Company Description
-              </h4> */}
               <div
                 style={{
                   fontSize: "",
@@ -466,16 +381,6 @@ export default function JobDetails(props) {
                   __html: data.payload.jobData.companyDescription,
                 }}
               ></div>
-              {/* <h4
-                className="roboto-slab"
-                style={{
-                  fontSize: "1.27rem",
-                  fontWeight: "700",
-                  paddingTop: "30px",
-                }}
-              >
-                Job Description
-              </h4> */}
               <div
                 style={{ fontSize: "1rem" }}
                 className="roboto-slab"
