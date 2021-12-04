@@ -1,4 +1,21 @@
 import React from "react";
+
+// libraries
+import { useFormik } from "formik";
+import * as yup from "yup";
+import { useMutation } from "react-query";
+import { useSnackbar } from "notistack";
+import MUIEditor, { MUIEditorState } from "react-mui-draft-wysiwyg";
+import { toolbarControlTypes } from "react-mui-draft-wysiwyg";
+import {
+  convertFromHTML,
+  convertFromRaw,
+  convertToRaw,
+  ContentState,
+} from "draft-js";
+import { stateToHTML } from "draft-js-export-html";
+import { useQuery } from "react-query";
+
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import Radio from "@material-ui/core/Radio";
@@ -6,49 +23,26 @@ import { RadioGroup } from "@material-ui/core";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
-import { Input } from "@material-ui/core";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 // @material-ui/icons
-import {
-  DoneOutline,
-  Done,
-  DoneAll,
-  FormatLineSpacing,
-  FormatItalic,
-  Image,
-  FiberManualRecord,
-} from "@material-ui/icons";
+import { Done, Image, FiberManualRecord } from "@material-ui/icons";
 
 // core components
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
+import { useAuth } from "components/AuthProvider/AuthProvider";
 
+// styles
 import styles from "assets/jss/material-kit-react/views/landingPageSections/workStyle.js";
 import radioStyles from "assets/jss/material-kit-react/customCheckboxRadioSwitch.js";
 import customSelectStyle from "assets/jss/material-kit-react/customSelectStyle";
 import CustomFileInput from "components/CustomFileInput/CustomFileInput";
 import Progress from "components/Progress/Progress";
-
-import { useFormik, ErrorMessage } from "formik";
-import { FormHelperText } from "@material-ui/core";
-import * as yup from "yup";
-import { borderColor } from "@mui/system";
-
-import { useMutation } from "react-query";
-import { useAuth } from "components/AuthProvider/AuthProvider";
-import axios from "axios";
-import { useSnackbar } from "notistack";
-import MUIEditor, { MUIEditorState, toHTML } from "react-mui-draft-wysiwyg";
-import { toolbarControlTypes } from "react-mui-draft-wysiwyg";
-import { convertFromHTML, convertFromRaw, convertToRaw } from "draft-js";
-import { stateToHTML } from "draft-js-export-html";
-import { ContentState } from "draft-js";
-import { EditorState } from "draft-js";
-import { useQuery } from "react-query";
 
 const useStyles = makeStyles(styles);
 const useSelectStyles = makeStyles(customSelectStyle);
@@ -119,7 +113,7 @@ const validationSchema = yup.object({
     .trim()
     .url("Website must be a valid URL")
     .required("Website is required"),
-  planType: yup.string().required("Plan is required"),
+  // planType: yup.string().required("Plan is required"),
   // salary: yup.string().required("Salary is required"),
   // password: yup
   //   .string("Enter your password")
@@ -174,28 +168,19 @@ export default function FormEditSection(props) {
   const { enqueueSnackbar } = useSnackbar();
   const { state } = useAuth();
   const mutation = useMutation(
-    (editJob) =>
-      // axios.post(
-      //   `${process.env.REACT_APP_SERVER_URL}/recruiter/job/postjob`,
-      //   {
-      //     Authorization: `Bearer ${state.accessToken}`,
-      //     "Content-Type": "application/json",
-      //   },
-      //   newJob
-      // ),
-      {
-        return fetch(
-          `${process.env.REACT_APP_SERVER_URL}/recruiter/job/editjob/${jobId}`,
-          {
-            method: "PATCH",
-            headers: new Headers({
-              Authorization: `Bearer ${state.accessToken}`,
-              "Content-Type": "application/json",
-            }),
-            body: editJob,
-          }
-        );
-      },
+    (editJob) => {
+      return fetch(
+        `${process.env.REACT_APP_SERVER_URL}/recruiter/job/editjob/${jobId}`,
+        {
+          method: "PATCH",
+          headers: new Headers({
+            Authorization: `Bearer ${state.accessToken}`,
+            "Content-Type": "application/json",
+          }),
+          body: editJob,
+        }
+      );
+    },
     {
       onSuccess: () => {
         // Success notification
@@ -233,7 +218,6 @@ export default function FormEditSection(props) {
       companyTagLine: "",
       companyDescription: "",
       companyDescriptionState: null,
-      planType: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
@@ -302,6 +286,7 @@ export default function FormEditSection(props) {
         formik.values.applyType = data.payload.jobData.applyType;
         formik.values.applyValue = data.payload.jobData.applyValue;
         formik.values.candidateRegion = data.payload.jobData.candidateRegion;
+        formik.values.jobDescription = data.payload.jobData.jobDescription;
         // const jobBlocksFromHTML = convertFromHTML(
         //   data.payload.jobData.jobDescription
         // );
@@ -325,6 +310,8 @@ export default function FormEditSection(props) {
         setLogo(data.payload.jobData.logoFile);
         formik.values.companyWebsite = data.payload.jobData.companyWebsite;
         formik.values.companyTagLine = data.payload.jobData.companyTagLine;
+        formik.values.companyDescription =
+          data.payload.jobData.companyDescription;
         // const companyBlocksFromHTML = convertFromHTML(
         //   data.payload.jobData.companyDescription
         // );
@@ -342,7 +329,7 @@ export default function FormEditSection(props) {
             convertFromRaw(data.payload.jobData.companyDescriptionState)
           )
         );
-        formik.values.planType = data.payload.jobData.planType;
+        // formik.values.planType = data.payload.jobData.planType;
       },
     }
   );
@@ -412,7 +399,7 @@ export default function FormEditSection(props) {
                 </p>
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
-              {/* <GridItem xs={6} sm={6} md={6}></GridItem> */}
+
               {/* Position field */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem xs={10} sm={10} md={10}>
@@ -457,6 +444,7 @@ export default function FormEditSection(props) {
                 </FormHelperText>
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
+
               {/* Category, Job Type & Salary field */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem md={4}>
@@ -664,6 +652,7 @@ export default function FormEditSection(props) {
                 />
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
+
               {/* Candidate region field */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem xs={10} sm={10} md={10}>
@@ -713,7 +702,7 @@ export default function FormEditSection(props) {
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
 
-              {/* How to Apply section [̉̉̉̉applyType] */}
+              {/* How to Apply section [applyType] */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem xs={10} sm={10} md={10}>
                 <h3
@@ -780,8 +769,6 @@ export default function FormEditSection(props) {
                       <Radio
                         checked={formik.values.applyType === "URL"}
                         onChange={formik.handleChange}
-                        // value="b"
-                        // name={formik.values.applyType}
                         aria-label="URL"
                         icon={
                           <FiberManualRecord
@@ -810,8 +797,6 @@ export default function FormEditSection(props) {
                       <Radio
                         checked={formik.values.applyType === "Email"}
                         onChange={formik.handleChange}
-                        // value="b"
-                        // name={formik.values.applyType}
                         aria-label="B"
                         icon={
                           <FiberManualRecord
@@ -902,25 +887,6 @@ export default function FormEditSection(props) {
                   // onBlur={formik.handleBlur}
                   config={config}
                 />
-                {/* <CustomInput
-                  // labelText="Your Message"
-                  id="message"
-                  formControlProps={{
-                    fullWidth: true,
-                  }}
-                  inputProps={{
-                    multiline: true,
-                    rows: 5,
-                    name: "jobDescription",
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
-                    placeholder: "",
-                    value: formik.values.jobDescription,
-                    error:
-                      formik.touched.jobDescription &&
-                      Boolean(formik.errors.jobDescription),
-                  }}
-                /> */}
                 <p
                   style={{
                     marginTop: "-9px",
@@ -948,31 +914,7 @@ export default function FormEditSection(props) {
                 </FormHelperText>
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
-              {/* <ErrorMessage name="jobDescription" /> */}
-              {/* <CustomInput
-                labelText="Your Email"
-                id="email"
-                formControlProps={{
-                  fullWidth: true,
-                }}
-              />{" "}
-              <CustomInput
-                labelText="Your Message"
-                id="message"
-                formControlProps={{
-                  fullWidth: true,
-                  className: classes.textArea,
-                }}
-                inputProps={{
-                  multiline: true,
-                  rows: 5,
-                }}
-              /> */}
-              {/* <GridItem className="align-center" xs={12} sm={12} md={12}>
-                <Button round color="success">
-                  Send Message
-                </Button>
-              </GridItem> */}
+
               {/* Tell us about your company */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem xs={10} sm={10} md={10}>
@@ -984,7 +926,8 @@ export default function FormEditSection(props) {
                 </h3>
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
-              {/* Company Name field */}
+
+              {/* Company Name & Logo field */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem xs={6} sm={6} md={6}>
                 <h3
@@ -1083,26 +1026,9 @@ export default function FormEditSection(props) {
                 >
                   {formik.touched.logoFile && formik.errors.logoFile}
                 </FormHelperText>
-                {/* <CustomInput
-                  inputProps={{
-                    placeholder: "",
-                    type: "file",
-                    name: "logoFile",
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
-                    value: formik.values.logoFile,
-                    error:
-                      formik.touched.logoFile &&
-                      Boolean(formik.errors.logoFile),
-                  }}
-                  style={{ marginTop: "0px" }}
-                  id="logoFile"
-                  formControlProps={{
-                    fullWidth: true,
-                  }}
-                /> */}
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
+
               {/* Company Website & Tagline field */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem xs={4} sm={4} md={4}>
@@ -1174,56 +1100,7 @@ export default function FormEditSection(props) {
                 />
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
-              {/* Company Logo & Billing Email field
-              <GridItem xs={1} sm={1} md={1}></GridItem>
-              <GridItem xs={3} sm={3} md={3}>
-                <h3
-                  style={{
-                    marginBottom: "-27px",
-                    fontSize: "1.27rem",
-                    marginTop: "25px",
-                    paddingTop: "0px",
-                  }}
-                  className={classes.title + " align-left"}
-                >
-                  Company Logo <span style={{ color: "red" }}>*</span>
-                </h3>
-                <CustomInput
-                  inputProps={{
-                    placeholder: "",
-                  }}
-                  style={{ marginTop: "0px" }}
-                  id="companyName"
-                  formControlProps={{
-                    fullWidth: true,
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={1} sm={1} md={1}></GridItem>
-              <GridItem xs={3} sm={3} md={3}>
-                <h3
-                  style={{
-                    marginBottom: "-27px",
-                    fontSize: "1.27rem",
-                    marginTop: "25px",
-                    paddingTop: "0px",
-                  }}
-                  className={classes.title + " align-left"}
-                >
-                  Billing Email <span style={{ color: "red" }}>*</span>
-                </h3>
-                <CustomInput
-                  inputProps={{
-                    placeholder: "",
-                  }}
-                  style={{ marginTop: "0px" }}
-                  id="companyName"
-                  formControlProps={{
-                    fullWidth: true,
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={4} sm={4} md={4}></GridItem> */}
+
               {/* Tell us more about your company */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
               <GridItem xs={10} sm={10} md={10}>
@@ -1238,120 +1115,13 @@ export default function FormEditSection(props) {
                 >
                   Tell us more about your Company
                 </h3>
-                {/* <CustomInput
-                  id="message"
-                  formControlProps={{
-                    fullWidth: true,
-                  }}
-                  inputProps={{
-                    multiline: true,
-                    rows: 5,
-                    name: "companyDescription",
-                    value: formik.values.companyDescription,
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
-                  }}
-                /> */}
                 <MUIEditor
                   editorState={editorStateCompany}
                   onChange={onChangeCompany}
-                  // onChange={(newState) => {
-                  //   formik.setFieldValue("companyDescriptionState", newState);
-                  // }}
-                  // onBlur={formik.handleBlur}
                   config={config}
                 />
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
-
-              {/* Select Plan */}
-              {/* <GridItem xs={5} sm={5} md={5}></GridItem>
-              <GridItem xs={2} sm={2} md={2}>
-                <h3
-                  style={{
-                    marginBottom: "-27px",
-                    marginTop: "25px",
-                    fontSize: "1.27rem",
-                    paddingTop: "0px",
-                  }}
-                  className={classes.title + " align-left"}
-                >
-                  Select Plan <span style={{ color: "red" }}>*</span>
-                </h3>
-                <FormControl
-                  fullWidth
-                  className={selectClasses.selectFormControl}
-                  error={
-                    formik.touched.planType && Boolean(formik.errors.planType)
-                  }
-                >
-                  <InputLabel
-                    htmlFor="planType-select"
-                    className={selectClasses.selectLabel}
-                  ></InputLabel>
-                  <Select
-                    MenuProps={{
-                      className: selectClasses.selectMenu,
-                    }}
-                    classes={{
-                      select: selectClasses.select,
-                    }}
-                    inputProps={{
-                      id: "job-type-select",
-                      name: "planType",
-                      value: formik.values.planType,
-                      onChange: formik.handleChange,
-                      onBlur: formik.handleBlur,
-                    }}
-                  >
-                    <MenuItem
-                      disabled
-                      classes={{
-                        root: selectClasses.selectMenuItem,
-                      }}
-                    >
-                      Select Plan
-                    </MenuItem>
-                    <MenuItem
-                      classes={{
-                        root: selectClasses.selectMenuItem,
-                        selected: selectClasses.selectMenuItemSelected,
-                      }}
-                      value="1 Month"
-                    >
-                      1 Month
-                    </MenuItem>
-                    <MenuItem
-                      classes={{
-                        root: selectClasses.selectMenuItem,
-                        selected: selectClasses.selectMenuItemSelected,
-                      }}
-                      value="2 Month"
-                    >
-                      2 Month
-                    </MenuItem>
-                    <MenuItem
-                      classes={{
-                        root: selectClasses.selectMenuItem,
-                        selected: selectClasses.selectMenuItemSelected,
-                      }}
-                      value="3 Month"
-                    >
-                      3 Month
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-                <FormHelperText
-                  style={{ marginTop: "-7px" }}
-                  error={
-                    formik.touched.planType && Boolean(formik.errors.planType)
-                  }
-                >
-                  {formik.touched.planType && formik.errors.planType}
-                </FormHelperText>
-              </GridItem>
-
-              <GridItem xs={5} sm={5} md={5}></GridItem> */}
 
               {/* Submit Button */}
               <GridItem xs={1} sm={1} md={1}></GridItem>
@@ -1366,18 +1136,10 @@ export default function FormEditSection(props) {
                   color="success"
                   size="lg"
                   type="submit"
-                  // onClick={formik.onSubmit}
-                  // href="/post-a-job"
-                  // target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Done />
-                  <span className="post-a-job">
-                    Save Changes
-                    {/* Confirm & Pay
-                    {formik.values.planType &&
-                      " $" + planPrice[formik.values.planType]} */}
-                  </span>
+                  <span className="post-a-job">Save Changes</span>
                 </Button>
               </GridItem>
               <GridItem xs={1} sm={1} md={1}></GridItem>
